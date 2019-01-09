@@ -1,10 +1,10 @@
 import React from "react";
 import Icon from "react-native-vector-icons/FontAwesome";
-import Website from "./Website";
-import AddAppointment from "./AddAppointment";
-import TodaysAppointment from "./TodaysAppointment";
-import SetDateTime from "./SetDateTime";
-import Constant from "./Constants";
+import Website from "../screens/Website";
+import AddAppointment from "../screens/AddAppointment";
+import TodaysAppointment from "../screens/TodaysAppointment";
+import SetDateTime from "../screens/SetDateTime";
+import Constant from "../components/Constants";
 import {
   createAppContainer,
   createBottomTabNavigator,

@@ -1,7 +1,8 @@
 import React from "react";
-import Styles from "./Style";
+import Styles from "../components/Style";
 import { Font, AppLoading } from "expo";
-import Constants from "./Constants";
+import Constants from "../components/Constants";
+import Appointment from "../modal/Appointment";
 import {
   Container,
   Header,
@@ -17,7 +18,8 @@ import {
   Picker,
   Textarea,
   Button,
-  Text
+  Text,
+  Label
 } from "native-base";
 
 export default class AddAppointment extends React.Component {
@@ -28,32 +30,34 @@ export default class AddAppointment extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      timeUnit: 0,
       loading: true,
-      patient: {
-        name: "",
-        mobile: "",
-        gender: "gender",
-        age: "",
-        treatment: "Treatment",
-        description: "",
-        appointment: ""
-      }
+      appointment: new Appointment()
     };
   }
 
-  selectGender(selectedGender) {
+  updateGender(selectedGender) {
+    let apnmt = this.state.appointment;
+    apnmt.patient._gender = selectedGender;
     this.setState({
-      patient: {
-        gender: selectedGender
-      }
+      appointment: apnmt
     });
   }
 
-  selectTreatment(selectedTreatment) {
+  updateTreatment(selectedTreatment) {
+    let apnmt = this.state.appointment;
+    apnmt.treatment = selectedTreatment;
     this.setState({
-      patient: {
-        treatment: selectedTreatment
-      }
+      appointment: apnmt
+    });
+  }
+
+  updateTimeUnit() {
+    let unit = this.state.timeUnit;
+    unit++;
+    unit = unit % Constants.time_unit.length;
+    this.setState({
+      timeUnit: unit
     });
   }
 
@@ -89,8 +93,10 @@ export default class AddAppointment extends React.Component {
                 ]}
               />
             </Left>
-            <Body>
-              <Title>Add Appointment</Title>
+            <Body style={{ flex: 3 }}>
+              <Title style={{ color: Constants.theme_compliment_color }}>
+                Add Appointment
+              </Title>
             </Body>
             <Right />
           </Header>
@@ -113,7 +119,7 @@ export default class AddAppointment extends React.Component {
                 />
               </Item>
               <Item>
-                <Item style={{ width: "50%" }}>
+                <Item style={{ width: "50%", borderColor: "transparent" }}>
                   <Icon
                     type="FontAwesome"
                     name="transgender"
@@ -122,9 +128,12 @@ export default class AddAppointment extends React.Component {
                   <Picker
                     mode="dropdown"
                     iosHeader="Select Gender"
-                    iosIcon={<Icon name="ios-arrow-down-outline" />}
-                    selectedValue={this.state.patient.gender}
-                    onValueChange={this.selectGender.bind(this)}
+                    textStyle={{ color: Constants.theme_color }}
+                    iosIcon={
+                      <Icon style={Styles.iconStyle} name="ios-arrow-down" />
+                    }
+                    selectedValue={this.state.appointment.patient._gender}
+                    onValueChange={this.updateGender.bind(this)}
                   >
                     <Picker.Item
                       color={Constants.theme_color}
@@ -143,7 +152,7 @@ export default class AddAppointment extends React.Component {
                     />
                   </Picker>
                 </Item>
-                <Item style={{ width: "50%" }}>
+                <Item style={{ width: "50%", borderColor: "transparent" }}>
                   <Icon
                     type="FontAwesome"
                     name="child"
@@ -164,10 +173,13 @@ export default class AddAppointment extends React.Component {
                   style={Styles.iconStyle}
                 />
                 <Picker
-                  iosHeader="Select Treatment"
-                  iosIcon={<Icon name="ios-arrow-down-outline" />}
-                  selectedValue={this.state.patient.treatment}
-                  onValueChange={this.selectTreatment.bind(this)}
+                  iosHeader="Treatments"
+                  textStyle={{ color: Constants.theme_color }}
+                  iosIcon={
+                    <Icon style={Styles.iconStyle} name="ios-arrow-down" />
+                  }
+                  selectedValue={this.state.appointment.treatment}
+                  onValueChange={this.updateTreatment.bind(this)}
                 >
                   {Constants.treatments.map((treatment, index) => {
                     return (
@@ -206,6 +218,28 @@ export default class AddAppointment extends React.Component {
                     style={{ fontSize: 15, color: Constants.theme_color }}
                   />
                 </Button>
+              </Item>
+              <Item>
+                <Icon type="FontAwesome" name="bell" style={Styles.iconStyle} />
+                <Label style={{ paddingLeft: 5, color: Constants.theme_color }}>
+                  Remind me before
+                </Label>
+                <Item style={{ borderColor: "transparent", width: "10%" }}>
+                  <Input
+                    selectTextOnFocus
+                    defaultValue={Constants.reminder + ""}
+                    keyboardType="numeric"
+                    maxLength={2}
+                    placeholderTextColor={Constants.theme_color}
+                    style={{ color: Constants.theme_color }}
+                  />
+                </Item>
+                <Label
+                  onPress={this.updateTimeUnit.bind(this)}
+                  style={{ color: Constants.theme_color }}
+                >
+                  {Constants.time_unit[this.state.timeUnit]}
+                </Label>
               </Item>
               <Item last style={{ paddingTop: 20 }}>
                 <Icon

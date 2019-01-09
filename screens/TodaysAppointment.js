@@ -1,6 +1,6 @@
 import React from "react";
-import Styles from "./Style";
-import Constants from "./Constants";
+import Styles from "../components/Style";
+import Constants from "../components/Constants";
 import { Font, AppLoading } from "expo";
 import {
   Container,
@@ -89,7 +89,9 @@ export default class TodaysAppointment extends React.Component {
               />
             </Left>
             <Body style={{ flex: 3 }}>
-              <Title>Today's Appointments</Title>
+              <Title style={{ color: Constants.theme_compliment_color }}>
+                Today's Appointments
+              </Title>
             </Body>
             <Right />
           </Header>

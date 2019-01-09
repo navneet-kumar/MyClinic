@@ -1,5 +1,6 @@
 {
   "main": "node_modules/expo/AppEntry.js",
+  "name": "myclinic",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
@@ -13,7 +14,8 @@
     "react": "16.5.0",
     "react-native": "https://github.com/expo/react-native/archive/sdk-31.0.0.tar.gz",
     "react-native-calendars": "^1.21.0",
-    "react-native-unified-contacts": "^1.6.2",
+    "react-native-contacts": "^2.2.5",
+    "react-native-datepicker": "^1.7.2",
     "react-native-vector-icons": "^6.1.0",
     "react-navigation": "^3.0.9"
   },
