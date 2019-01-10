@@ -3,6 +3,7 @@ import Constants from "../components/Constants";
 import Styles from "../components/Style";
 import { CalendarList } from "react-native-calendars";
 import TimePicker from "react-native-datepicker";
+import { Dimensions } from "react-native";
 import {
   Container,
   Header,
@@ -13,7 +14,10 @@ import {
   Right,
   Body,
   Button,
-  Text
+  Text,
+  Item,
+  Picker,
+  Label
 } from "native-base";
 
 export default class SetDateTime extends React.Component {
@@ -30,7 +34,9 @@ export default class SetDateTime extends React.Component {
         Constants.appointment_booking_range
       ),
       markedDate: { [this.timeToString(Constants.today)]: { selected: true } },
-      markedTime: null
+      pickedTime: "",
+      pickedDate: this.timeToString(Constants.today),
+      duration: 30
     };
   }
 
@@ -49,12 +55,23 @@ export default class SetDateTime extends React.Component {
    * Sample Date Object : {"year":2019,"month":1,"day":23,"timestamp":1548201600000,"dateString":"2019-01-23"}
    */
   onDateChange(date) {
-    if (typeof date !== undefined && typeof date.dateString !== undefined) {
+    if (typeof date !== undefined) {
       this.setState({
         markedDate: { [date.dateString]: { selected: true } },
-        title: date.day + "-" + date.month + "-" + date.year
+        pickedDate: new Date(date.dateString)
       });
     }
+  }
+  /**
+   * go back to the parent screen
+   */
+  backToAddAppointment() {
+    this.props.navigation.state.params.updateDateTime(
+      this.state.pickedDate,
+      this.state.pickedTime,
+      this.state.duration
+    );
+    this.props.navigation.goBack();
   }
 
   timeToString(time) {
@@ -62,12 +79,20 @@ export default class SetDateTime extends React.Component {
     return date.toISOString().split("T")[0];
   }
 
+  setAppointmentDuration(duration) {
+    if (typeof duration !== undefined) {
+      this.setState({
+        duration: duration
+      });
+    }
+  }
+
   render() {
     return (
       <Container>
         <Header style={{ backgroundColor: Constants.theme_color }}>
           <Left>
-            <Button transparent onPress={() => this.props.navigation.goBack()}>
+            <Button transparent onPress={() => this.backToAddAppointment()}>
               <Icon
                 name="arrow-back"
                 style={[
@@ -79,35 +104,128 @@ export default class SetDateTime extends React.Component {
           </Left>
           <Body>
             <Title style={{ color: Constants.theme_compliment_color }}>
-              {this.state.title}
+              {Constants.date_time}
             </Title>
           </Body>
           <Right />
         </Header>
-        <Content contentContainerStyle={{ flexGrow: 1 }}>
+        <Content>
           <CalendarList
+            horizontal={true}
+            pagingEnabled={true}
+            showScrollIndicator={true}
+            pastScrollRange={0}
+            futureScrollRange={Constants.appointment_booking_range}
             markedDates={this.state.markedDate}
             current={this.timeToString(Constants.today)}
             minDate={this.timeToString(Constants.today)}
             maxDate={this.timeToString(this.state.endDate)}
-            horizontal={true}
-            pagingEnabled={true}
             onDayPress={this.onDateChange.bind(this)}
           />
 
-          <TimePicker
-            style={{ width: 200 }}
-            date={this.state.markedTime}
-            mode="time"
-            format="HH:mm a"
-            confirmBtnText="Confirm"
-            cancelBtnText="Cancel"
-            minuteInterval={10}
-            onDateChange={time => {
-              console.log("time changed - " + JSON.stringify(time));
-              this.setState({ markedTime: time });
-            }}
-          />
+          <Item>
+            <Icon type="Entypo" name="stopwatch" style={Styles.iconStyle} />
+            <Label style={{ color: Constants.theme_color }}>Duration</Label>
+
+            <Item
+              style={{
+                flex: 1,
+                justifyContent: "flex-end",
+                borderColor: "transparent"
+              }}
+            >
+              <Picker
+                mode="dropdown"
+                iosHeader="Duration"
+                textStyle={{
+                  color: Constants.theme_color
+                }}
+                selectedValue={this.state.duration}
+                onValueChange={this.setAppointmentDuration.bind(this)}
+              >
+                <Picker.Item
+                  color={Constants.theme_color}
+                  label="30 min"
+                  value={30}
+                />
+                <Picker.Item
+                  color={Constants.theme_color}
+                  label="45 min"
+                  value={45}
+                />
+                <Picker.Item
+                  color={Constants.theme_color}
+                  label="1 hour"
+                  value={60}
+                />
+                <Picker.Item
+                  color={Constants.theme_color}
+                  label="1 hour 30 mins"
+                  value={90}
+                />
+                <Picker.Item
+                  color={Constants.theme_color}
+                  label="2 hour"
+                  value={120}
+                />
+                <Picker.Item
+                  color={Constants.theme_color}
+                  label="2 hour 30 mins"
+                  value={150}
+                />
+                <Picker.Item
+                  color={Constants.theme_color}
+                  label="3 hour"
+                  value={180}
+                />
+              </Picker>
+            </Item>
+          </Item>
+          <Item>
+            <Icon type="Entypo" name="clock" style={Styles.iconStyle} />
+            <Label style={{ color: Constants.theme_color }}>Start Time </Label>
+            <TimePicker
+              date={this.state.pickedTime}
+              mode="time"
+              format="hh:mm a"
+              confirmBtnText="Confirm"
+              cancelBtnText="Cancel"
+              showIcon={false}
+              minuteInterval={10}
+              onDateChange={time => {
+                this.setState({ pickedTime: time });
+              }}
+              // timeZoneOffsetInMinutes={Constants.today.getTimezoneOffset() * -1}
+              customStyles={{
+                dateInput: {
+                  borderWidth: 0
+                },
+                dateText: {
+                  color: Constants.theme_color,
+                  fontSize: 16,
+                  alignSelf: "flex-end"
+                }
+              }}
+              style={{ flexGrow: 1 }}
+            />
+          </Item>
+          <Item style={{ paddingTop: 30, alignSelf: "center" }}>
+            <Button
+              iconRight
+              style={{ backgroundColor: Constants.theme_color }}
+              onPress={() => this.backToAddAppointment()}
+            >
+              <Text>Done</Text>
+              <Icon
+                type="FontAwesome"
+                name="check"
+                style={[
+                  Styles.iconStyle,
+                  { color: Constants.theme_compliment_color }
+                ]}
+              />
+            </Button>
+          </Item>
         </Content>
       </Container>
     );

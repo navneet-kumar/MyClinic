@@ -65,8 +65,27 @@ export default class AddAppointment extends React.Component {
     console.log("submit()");
   }
 
-  setDateTime() {
-    this.props.navigation.navigate("setDateTime");
+  updateDateTime(date, time, duration) {
+    console.log("I am call back() ");
+    console.log(
+      "Response : " + date + ", " + time + " ( " + duration + " min(s) )"
+    );
+    let apnmt = this.state.appointment;
+    apnmt.duration = duration;
+    apnmt.timestamp = new Date(time);
+
+    // var hm = time.split(" ");
+    // var h = 0;
+    // if (hm[hm.length - 1] == "pm") {
+    //   h = 12;
+    // }
+    // hm = hm[0].split(":");
+    // h = h + parseInt(hm[0]);
+    // var m = parseInt(hm[1]);
+
+    this.setState({
+      appointment: apnmt
+    });
   }
 
   async componentWillMount() {
@@ -201,7 +220,11 @@ export default class AddAppointment extends React.Component {
                 />
                 <Button
                   transparent
-                  onPress={this.setDateTime.bind(this)}
+                  onPress={() => {
+                    this.props.navigation.navigate("setDateTime", {
+                      updateDateTime: this.updateDateTime.bind(this)
+                    });
+                  }}
                   style={{
                     flex: 1
                   }}
@@ -210,7 +233,7 @@ export default class AddAppointment extends React.Component {
                     uppercase={false}
                     style={{ paddingLeft: 5, color: Constants.theme_color }}
                   >
-                    {Constants.date_time}
+                    {this.state.schedule}
                   </Text>
                   <Icon
                     type="FontAwesome"

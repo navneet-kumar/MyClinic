@@ -7,6 +7,7 @@ export default class Appointment {
   description: string;
   reminder: number; // always in min(s)
   timestamp: Date;
+  duration: number;
 
   constructor(existingPatient) {
     if (typeof existingPatient == "undefined") {
