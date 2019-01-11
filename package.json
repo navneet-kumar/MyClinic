@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "expo": "^31.0.0",
+    "moment": "^2.23.0",
     "native-base": "^2.10.0",
     "prop-types": "^15.6.2",
     "react": "16.5.0",

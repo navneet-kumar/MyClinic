@@ -4,6 +4,7 @@ import Styles from "../components/Style";
 import { CalendarList } from "react-native-calendars";
 import TimePicker from "react-native-datepicker";
 import { Dimensions } from "react-native";
+import moment from "moment";
 import {
   Container,
   Header,
@@ -29,13 +30,9 @@ export default class SetDateTime extends React.Component {
     super(props);
     this.state = {
       title: Constants.date_time,
-      endDate: this.addMonthsTo(
-        Constants.today,
-        Constants.appointment_booking_range
-      ),
-      markedDate: { [this.timeToString(Constants.today)]: { selected: true } },
-      pickedTime: "",
-      pickedDate: this.timeToString(Constants.today),
+      markedDate: { [moment().format("YYYY-MM-DD")]: { selected: true } },
+      pickedTime: moment().format("hh:mm A"),
+      pickedDate: moment().format("DD/MM/YYYY"),
       duration: 30
     };
   }
@@ -58,10 +55,19 @@ export default class SetDateTime extends React.Component {
     if (typeof date !== undefined) {
       this.setState({
         markedDate: { [date.dateString]: { selected: true } },
-        pickedDate: new Date(date.dateString)
+        pickedDate: moment(new Date(date.dateString)).format("DD/MM/YYYY")
       });
     }
   }
+
+  setAppointmentDuration(duration) {
+    if (typeof duration !== undefined) {
+      this.setState({
+        duration: duration
+      });
+    }
+  }
+
   /**
    * go back to the parent screen
    */
@@ -72,19 +78,6 @@ export default class SetDateTime extends React.Component {
       this.state.duration
     );
     this.props.navigation.goBack();
-  }
-
-  timeToString(time) {
-    const date = new Date(time);
-    return date.toISOString().split("T")[0];
-  }
-
-  setAppointmentDuration(duration) {
-    if (typeof duration !== undefined) {
-      this.setState({
-        duration: duration
-      });
-    }
   }
 
   render() {
@@ -102,7 +95,7 @@ export default class SetDateTime extends React.Component {
               />
             </Button>
           </Left>
-          <Body>
+          <Body style={{ flex: 3 }}>
             <Title style={{ color: Constants.theme_compliment_color }}>
               {Constants.date_time}
             </Title>
@@ -117,9 +110,8 @@ export default class SetDateTime extends React.Component {
             pastScrollRange={0}
             futureScrollRange={Constants.appointment_booking_range}
             markedDates={this.state.markedDate}
-            current={this.timeToString(Constants.today)}
-            minDate={this.timeToString(Constants.today)}
-            maxDate={this.timeToString(this.state.endDate)}
+            current={moment().toDate()}
+            minDate={moment().toDate()}
             onDayPress={this.onDateChange.bind(this)}
           />
 
@@ -187,7 +179,7 @@ export default class SetDateTime extends React.Component {
             <TimePicker
               date={this.state.pickedTime}
               mode="time"
-              format="hh:mm a"
+              format="hh:mm A"
               confirmBtnText="Confirm"
               cancelBtnText="Cancel"
               showIcon={false}

@@ -66,22 +66,15 @@ export default class AddAppointment extends React.Component {
   }
 
   updateDateTime(date, time, duration) {
-    console.log("I am call back() ");
-    console.log(
-      "Response : " + date + ", " + time + " ( " + duration + " min(s) )"
-    );
+    let dateTimeStr = date + ", " + time;
+    console.log("Date time set to : " + dateTimeStr);
+
+    // update title to selected date & time
+    Constants.date_time = dateTimeStr + " [ " + duration + " min(s) ]";
+
     let apnmt = this.state.appointment;
     apnmt.duration = duration;
-    apnmt.timestamp = new Date(time);
-
-    // var hm = time.split(" ");
-    // var h = 0;
-    // if (hm[hm.length - 1] == "pm") {
-    //   h = 12;
-    // }
-    // hm = hm[0].split(":");
-    // h = h + parseInt(hm[0]);
-    // var m = parseInt(hm[1]);
+    apnmt.timestamp = new Date(dateTimeStr);
 
     this.setState({
       appointment: apnmt
@@ -233,7 +226,7 @@ export default class AddAppointment extends React.Component {
                     uppercase={false}
                     style={{ paddingLeft: 5, color: Constants.theme_color }}
                   >
-                    {this.state.schedule}
+                    {Constants.date_time}
                   </Text>
                   <Icon
                     type="FontAwesome"
