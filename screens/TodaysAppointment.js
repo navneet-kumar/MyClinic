@@ -1,22 +1,21 @@
 import React from "react";
 import Styles from "../components/Style";
 import Constants from "../components/Constants";
+import AppointmentCard from "../components/AppointmentCard";
 import { FlatList } from "react-native";
 import {
   Container,
   Header,
   Content,
   Title,
-  Icon,
   Left,
   Right,
   Body,
+  Icon,
+  Item,
   List,
-  ListItem,
-  Text,
-  Item
+  ListItem
 } from "native-base";
-import AppointmentCard from "../components/AppointmentCard";
 
 const appointments = [
   {
@@ -65,14 +64,12 @@ export default class TodaysAppointment extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      loading: true
+      loading: true,
+      listViewData: appointments
     };
   }
 
   async componentWillMount() {
-    await Font.loadAsync({
-      Roboto_medium: require("native-base/Fonts/Roboto_medium.ttf")
-    });
     this.setState({ loading: false });
   }
 
@@ -97,7 +94,13 @@ export default class TodaysAppointment extends React.Component {
           </Body>
           <Right />
         </Header>
-        <Content>
+        <Content
+          contentContainerStyle={{
+            flex: 1,
+            justifyContent: "center",
+            borderColor: "transparent"
+          }}
+        >
           <ShowAppointments appointments={appointments} />
         </Content>
       </Container>
@@ -106,25 +109,61 @@ export default class TodaysAppointment extends React.Component {
 }
 
 class ShowAppointments extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      enable: true
+    };
+  }
+  renderItem(item) {
+    return (
+      <AppointmentCard
+        name={item.name}
+        mobile={item.mobile}
+        age={item.age}
+        gender={item.gender}
+        description={item.description}
+      />
+    );
+  }
+
+  setScrollEnabled(enable) {
+    this.setState({
+      enable
+    });
+  }
+
   render() {
     if (this.props.appointments.length > 0) {
       return (
         <FlatList
           data={this.props.appointments}
           keyExtractor={(item, index) => index.toString()}
-          renderItem={({ item }) => (
-            <AppointmentCard
-              name={item.name}
-              mobile={item.mobile}
-              age={item.age}
-              gender={item.gender}
-              description={item.description}
-            />
-          )}
+          renderItem={({ item }) => this.renderItem(item)}
         />
       );
     } else {
-      return <Title>No Appointments</Title>;
+      return (
+        <Item style={{ flexDirection: "column", borderColor: "transparent" }}>
+          <Item style={{ borderColor: "transparent" }}>
+            <Icon
+              type="MaterialCommunityIcons"
+              name="calendar-search"
+              style={[Styles.iconStyle, { fontSize: 150 }]}
+            />
+          </Item>
+          <Item style={{ borderColor: "transparent" }}>
+            <Title
+              style={{
+                color: Constants.theme_color,
+                borderColor: "transparent"
+              }}
+            >
+              No Appointments today, enjoy your day ..!!
+            </Title>
+          </Item>
+        </Item>
+      );
     }
   }
 }

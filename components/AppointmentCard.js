@@ -15,7 +15,8 @@ const Styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     padding: 5,
-    backgroundColor: Constant.theme_compliment_color
+    backgroundColor: Constant.theme_compliment_color,
+    color: Constant.theme_color
   },
   space: {
     flexDirection: "row",
