@@ -13,7 +13,7 @@
     "react": "16.6.3",
     "react-native": "0.57.8",
     "react-native-calendars": "^1.21.0",
-    "react-native-contacts": "^2.2.5",
+    "react-native-contacts": "^3.0.0",
     "react-native-datepicker": "^1.7.2",
     "react-native-gesture-handler": "^1.0.12",
     "react-native-vector-icons": "^6.1.0",

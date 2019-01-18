@@ -2,6 +2,8 @@ import React from "react";
 import Styles from "../components/Style";
 import Constants from "../components/Constants";
 import Appointment from "../modal/Appointment.ts";
+import { ShowOkAlert } from "../components/Helpers";
+import Contacts from "react-native-contacts";
 import {
   Container,
   Header,
@@ -31,7 +33,8 @@ export default class AddAppointment extends React.Component {
     this.state = {
       timeUnit: 0,
       loading: true,
-      appointment: new Appointment()
+      appointment: new Appointment(),
+      contacts: []
     };
   }
 
@@ -80,7 +83,37 @@ export default class AddAppointment extends React.Component {
     });
   }
 
+  readContacts(contacts) {
+    var contactList = [];
+    for (var i in contacts) {
+      try {
+        contactList.push({
+          id: contacts[i].recordID,
+          firstName: contacts[i].givenName,
+          lastName: contacts[i].familyName,
+          number: contacts[i].phoneNumbers[0].number
+        });
+      } catch (err) {
+        console.log(contacts[i]);
+      }
+    }
+
+    return contactList;
+  }
+
   async componentWillMount() {
+    if (
+      Constants.permissions["android.permission.READ_CONTACTS"] == "granted"
+    ) {
+      Contacts.getAll((err, contacts) => {
+        if (err) throw err;
+        console.log(this.readContacts(contacts));
+      });
+    } else {
+      ShowOkAlert("No permissions to get your contact");
+    }
+
+    console.log();
     this.setState({ loading: false });
   }
 

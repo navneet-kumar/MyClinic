@@ -3,6 +3,7 @@ import Styles from "../components/Style";
 import Constants from "../components/Constants";
 import AppointmentCard from "../components/AppointmentCard";
 import { FlatList } from "react-native";
+import { GetAllPermissions } from "../components/Helpers";
 import {
   Container,
   Header,
@@ -17,60 +18,62 @@ import {
   ListItem
 } from "native-base";
 
-const appointments = [
-  {
-    name: "brayn",
-    mobile: "+91 8090898872",
-    gender: "male",
-    age: 43,
-    description: "RCT week 3",
-    appointment: ""
-  },
-  {
-    name: "john",
-    mobile: "+91 8090898872",
-    gender: "male",
-    age: 23,
-    description: "Clean up",
-    appointment: ""
-  },
-  {
-    name: "Maria",
-    mobile: "+91 8090898872",
-    gender: "female",
-    age: 18,
-    description: "Checkup",
-    appointment: ""
-  },
-  {
-    name: "kaun",
-    mobile: "+91 8090898872",
-    gender: "male",
-    age: 53,
-    description: "No info",
-    appointment: ""
-  },
-  {
-    name: "Julie",
-    mobile: "+91 8090898872",
-    gender: "female",
-    age: 35,
-    description: " RCT week 3",
-    appointment: ""
-  }
-];
+const appointments = [];
+//   {
+//     name: "brayn",
+//     mobile: "+91 8090898872",
+//     gender: "male",
+//     age: 43,
+//     description: "RCT week 3",
+//     appointment: ""
+//   },
+//   {
+//     name: "john",
+//     mobile: "+91 8090898872",
+//     gender: "male",
+//     age: 23,
+//     description: "Clean up",
+//     appointment: ""
+//   },
+//   {
+//     name: "Maria",
+//     mobile: "+91 8090898872",
+//     gender: "female",
+//     age: 18,
+//     description: "Checkup",
+//     appointment: ""
+//   },
+//   {
+//     name: "kaun",
+//     mobile: "+91 8090898872",
+//     gender: "male",
+//     age: 53,
+//     description: "No info",
+//     appointment: ""
+//   },
+//   {
+//     name: "Julie",
+//     mobile: "+91 8090898872",
+//     gender: "female",
+//     age: 35,
+//     description: " RCT week 3",
+//     appointment: ""
+//   }
+// ];
 
 export default class TodaysAppointment extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      loading: true,
       listViewData: appointments
     };
   }
 
   async componentWillMount() {
-    this.setState({ loading: false });
+    // get all desired permissions
+    GetAllPermissions().then(data => {
+      Constants.permissions = data;
+    });
   }
 
   render() {
