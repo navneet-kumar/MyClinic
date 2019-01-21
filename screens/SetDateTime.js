@@ -3,7 +3,6 @@ import Constants from "../components/Constants";
 import Styles from "../components/Style";
 import { CalendarList } from "react-native-calendars";
 import TimePicker from "react-native-datepicker";
-import { Dimensions } from "react-native";
 import moment from "moment";
 import {
   Container,
@@ -42,7 +41,7 @@ export default class SetDateTime extends React.Component {
    * @param {*} toDate
    * @param {*} byMonths
    */
-  addMonthsTo(toDate: Date, byMonths: Number) {
+  addMonthsTo(toDate, byMonths) {
     let tempDate = new Date(toDate);
     tempDate = new Date(tempDate.setMonth(toDate.getMonth() + byMonths));
     return tempDate;

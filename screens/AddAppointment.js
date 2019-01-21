@@ -2,7 +2,9 @@ import React from "react";
 import Styles from "../components/Style";
 import Constants from "../components/Constants";
 import Appointment from "../modal/Appointment.ts";
-import { ShowOkAlert } from "../components/Helpers";
+import { ShowOkAlert, isAndroid, Warning } from "../components/Helpers";
+
+import InputWithSuggestions from "../components/InputWithSuggestions";
 import Contacts from "react-native-contacts";
 import {
   Container,
@@ -46,6 +48,16 @@ export default class AddAppointment extends React.Component {
     });
   }
 
+  updateContact(contact) {
+    let apnmt = this.state.appointment;
+    apnmt.patient._name = contact.name;
+    apnmt.patient._mobile = contact.number;
+    apnmt.patient._id = contact.id;
+    this.setState({
+      appointment: apnmt
+    });
+  }
+
   updateTreatment(selectedTreatment) {
     let apnmt = this.state.appointment;
     apnmt.treatment = selectedTreatment;
@@ -65,17 +77,19 @@ export default class AddAppointment extends React.Component {
 
   addAppointment() {
     console.log("submit()");
+    ShowOkAlert(JSON.stringify(this.state.appointment));
   }
 
   updateDateTime(date, time, duration) {
     let dateTimeStr = date + ", " + time;
-    console.log("Date time set to : " + dateTimeStr);
 
     // update title to selected date & time
     Constants.date_time = dateTimeStr + " [ " + duration + " min(s) ]";
 
     let apnmt = this.state.appointment;
     apnmt.duration = duration;
+    // console.error("creating date :" + dateTimeStr);
+    console.error(new Date(dateTimeStr));
     apnmt.timestamp = new Date(dateTimeStr);
 
     this.setState({
@@ -83,41 +97,52 @@ export default class AddAppointment extends React.Component {
     });
   }
 
-  readContacts(contacts) {
+  getAllContacts() {
+    let getContacts = true;
     var contactList = [];
-    for (var i in contacts) {
-      try {
-        contactList.push({
-          id: contacts[i].recordID,
-          firstName: contacts[i].givenName,
-          lastName: contacts[i].familyName,
-          number: contacts[i].phoneNumbers[0].number
-        });
-      } catch (err) {
-        console.log(contacts[i]);
+
+    if (isAndroid()) {
+      if (
+        Constants.permissions["android.permission.READ_CONTACTS"] !== "granted"
+      ) {
+        getContacts = false;
+        ShowOkAlert(
+          "Please allow us to read your contacts and help us give you a better experience."
+        );
       }
     }
 
+    if (getContacts) {
+      Contacts.getAll((err, contacts) => {
+        if (err) {
+          Warning(err);
+        } else if (contacts.length > 0) {
+          for (var i in contacts) {
+            try {
+              contactList.push({
+                id: contacts[i].recordID,
+                name:
+                  (contacts[i].givenName || "") +
+                  " " +
+                  (contacts[i].familyName || ""),
+                number: contacts[i].phoneNumbers[0].number
+              });
+            } catch (err) {
+              Warning(err);
+            }
+          }
+        }
+      });
+    }
     return contactList;
   }
 
   async componentWillMount() {
-    if (
-      Constants.permissions["android.permission.READ_CONTACTS"] == "granted"
-    ) {
-      Contacts.getAll((err, contacts) => {
-        if (err) throw err;
-        console.log(this.readContacts(contacts));
-      });
-    } else {
-      ShowOkAlert("No permissions to get your contact");
-    }
-
-    console.log();
-    this.setState({ loading: false });
+    this.setState({ loading: false, contacts: this.getAllContacts() });
   }
 
   render() {
+    const { query } = this.state;
     return (
       <Container>
         <Header style={{ backgroundColor: Constants.theme_color }}>
@@ -142,18 +167,39 @@ export default class AddAppointment extends React.Component {
           <Form>
             <Item>
               <Icon name="person" style={Styles.iconStyle} />
-              <Input
+              <InputWithSuggestions
                 placeholder="Patient Name"
-                placeholderTextColor={Constants.theme_color}
+                options={this.state.contacts}
+                renderLabel={c => {
+                  return c.name;
+                }}
+                renderKey={c => {
+                  return c.id;
+                }}
+                onSelectOption={c => {
+                  this.updateContact(c);
+                }}
               />
+              {/* <Item style={{ width: "90%" }}>
+                <Autocomplete
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  containerStyle={Styles.autoCompleteContainer}
+                  inputContainerStyle={Styles.autoCompleteInput}
+                  placeholder="Patient Name"
+                  defaultValue={query}
+                  onChangeText={text => this.setState({ query: text })}
+                />
+              </Item> */}
             </Item>
             <Item>
               <Icon name="call" style={Styles.iconStyle} />
               <Input
                 placeholder="Mobile Number"
                 keyboardType="numeric"
-                maxLength={10}
+                maxLength={15}
                 placeholderTextColor={Constants.theme_color}
+                defaultValue={this.state.appointment.patient._mobile}
               />
             </Item>
             <Item style={{ flex: 3 }}>
@@ -169,7 +215,7 @@ export default class AddAppointment extends React.Component {
                   iosIcon={
                     <Icon style={Styles.iconStyle} name="ios-arrow-down" />
                   }
-                  selectedValue={"gender"}
+                  selectedValue={this.state.appointment.patient._gender}
                   onValueChange={this.updateGender.bind(this)}
                 >
                   <Picker.Item

@@ -1,18 +1,20 @@
 import { PermissionsAndroid } from "react-native";
 import { name as appName } from "../app.json";
-import { Alert } from "react-native";
+import { Alert, Platform } from "react-native";
 
 export async function GetAllPermissions() {
   try {
-    const userResponse = await PermissionsAndroid.requestMultiple([
-      PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
-      PermissionsAndroid.PERMISSIONS.CALL_PHONE
-    ]);
-    return userResponse;
+    if (Platform.OS === "android") {
+      const userResponse = await PermissionsAndroid.requestMultiple([
+        PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
+        PermissionsAndroid.PERMISSIONS.CALL_PHONE
+      ]);
+      return userResponse;
+    }
   } catch (err) {
-    console.warn(err);
-    return null;
+    Warning(err);
   }
+  return null;
 }
 
 export async function ShowOkAlert(message) {
@@ -20,8 +22,25 @@ export async function ShowOkAlert(message) {
     Alert.alert(
       appName,
       message,
-      [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+      [{ text: "OK", onPress: () => console.info("OK Pressed") }],
       { cancelable: false }
     );
-  } catch (err) {}
+  } catch (err) {
+    Warning(err);
+  }
+}
+
+export function isAndroid() {
+  return Platform.OS === "android" ? true : false;
+}
+
+export function Warning(error) {
+  console.warn(
+    error.message +
+      " @fileName:lineNumber [ " +
+      error.fileName +
+      ":" +
+      error.lineNumber +
+      " ]"
+  );
 }

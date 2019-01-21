@@ -1,5 +1,5 @@
 import React from "react";
-import Icon from "react-native-vector-icons/FontAwesome";
+import { Icon } from "native-base";
 import Website from "../screens/Website";
 import AddAppointment from "../screens/AddAppointment";
 import TodaysAppointment from "../screens/TodaysAppointment";
@@ -33,7 +33,8 @@ const MainTabNavigator = createBottomTabNavigator(
         tabBarIcon: ({ tintColor }) => (
           <Icon
             name={"globe"}
-            size={3 * Constant.icon_size}
+            size={2 * Constant.icon_size}
+            style={{ color: tintColor }}
             color={tintColor}
           />
         )
@@ -45,8 +46,10 @@ const MainTabNavigator = createBottomTabNavigator(
         tabBarLabel: "Appointments",
         tabBarIcon: ({ tintColor }) => (
           <Icon
-            name={"calendar-times-o"}
-            size={3 * Constant.icon_size}
+            type="Octicons"
+            name="calendar"
+            size={2 * Constant.icon_size}
+            style={{ color: tintColor }}
             color={tintColor}
           />
         )
@@ -58,8 +61,10 @@ const MainTabNavigator = createBottomTabNavigator(
         tabBarLabel: "Add Appointments",
         tabBarIcon: ({ tintColor }) => (
           <Icon
-            name={"calendar-plus-o"}
-            size={3 * Constant.icon_size}
+            type="MaterialCommunityIcons"
+            name="calendar-edit"
+            size={2 * Constant.icon_size}
+            style={{ color: tintColor }}
             color={tintColor}
           />
         )
