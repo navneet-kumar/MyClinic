@@ -3,7 +3,7 @@ import Styles from "../components/Style";
 import Constants from "../components/Constants";
 import Appointment from "../modal/Appointment.ts";
 import { ShowOkAlert, isAndroid, Warning } from "../components/Helpers";
-
+import moment from "moment";
 import InputWithSuggestions from "../components/InputWithSuggestions";
 import Contacts from "react-native-contacts";
 import {
@@ -85,12 +85,11 @@ export default class AddAppointment extends React.Component {
 
     // update title to selected date & time
     Constants.date_time = dateTimeStr + " [ " + duration + " min(s) ]";
+    let timestamp = new moment(dateTimeStr, "DD/MM/YYYY, hh:mm A");
 
     let apnmt = this.state.appointment;
     apnmt.duration = duration;
-    // console.error("creating date :" + dateTimeStr);
-    console.error(new Date(dateTimeStr));
-    apnmt.timestamp = new Date(dateTimeStr);
+    apnmt.timestamp = timestamp;
 
     this.setState({
       appointment: apnmt
@@ -180,17 +179,6 @@ export default class AddAppointment extends React.Component {
                   this.updateContact(c);
                 }}
               />
-              {/* <Item style={{ width: "90%" }}>
-                <Autocomplete
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  containerStyle={Styles.autoCompleteContainer}
-                  inputContainerStyle={Styles.autoCompleteInput}
-                  placeholder="Patient Name"
-                  defaultValue={query}
-                  onChangeText={text => this.setState({ query: text })}
-                />
-              </Item> */}
             </Item>
             <Item>
               <Icon name="call" style={Styles.iconStyle} />
@@ -336,7 +324,7 @@ export default class AddAppointment extends React.Component {
               />
               <Textarea
                 rowSpan={4}
-                placeholder="Description"
+                placeholder="Additional case information, if available."
                 placeholderTextColor={Constants.theme_color}
                 style={{ color: Constants.theme_color }}
               />

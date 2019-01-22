@@ -1,6 +1,6 @@
 import React from "react";
 import Styles from "../components/Style";
-import Constants from "../components/Constants";
+import Constant from "../components/Constants";
 import AppointmentCard from "../components/AppointmentCard";
 import { FlatList } from "react-native";
 import { GetAllPermissions } from "../components/Helpers";
@@ -9,13 +9,12 @@ import {
   Header,
   Content,
   Title,
+  Text,
   Left,
   Right,
   Body,
   Icon,
-  Item,
-  List,
-  ListItem
+  Item
 } from "native-base";
 
 const appointments = [];
@@ -72,26 +71,26 @@ export default class TodaysAppointment extends React.Component {
   async componentWillMount() {
     // get all desired permissions
     GetAllPermissions().then(data => {
-      Constants.permissions = data;
+      Constant.permissions = data;
     });
   }
 
   render() {
     return (
       <Container>
-        <Header style={{ backgroundColor: Constants.theme_color }}>
+        <Header style={{ backgroundColor: Constant.theme_color }}>
           <Left>
             <Icon
               type="FontAwesome"
               name="bookmark"
               style={[
                 Styles.iconStyle,
-                { color: Constants.theme_compliment_color }
+                { color: Constant.theme_compliment_color }
               ]}
             />
           </Left>
           <Body style={{ flex: 3 }}>
-            <Title style={{ color: Constants.theme_compliment_color }}>
+            <Title style={{ color: Constant.theme_compliment_color }}>
               Today's Appointments
             </Title>
           </Body>
@@ -150,20 +149,15 @@ class ShowAppointments extends React.Component {
         <Item style={{ flexDirection: "column", borderColor: "transparent" }}>
           <Item style={{ borderColor: "transparent" }}>
             <Icon
-              type="MaterialCommunityIcons"
-              name="calendar-search"
+              type="EvilIcons"
+              name="calendar"
               style={[Styles.iconStyle, { fontSize: 150 }]}
             />
           </Item>
           <Item style={{ borderColor: "transparent" }}>
-            <Title
-              style={{
-                color: Constants.theme_color,
-                borderColor: "transparent"
-              }}
-            >
-              No Appointments today, enjoy your day ..!!
-            </Title>
+            <Text style={{ textAlign: "center", color: Constant.theme_color }}>
+              No Appointments scheduled for today ... {"\n"} Enjoy !!
+            </Text>
           </Item>
         </Item>
       );

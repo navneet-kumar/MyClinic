@@ -4,7 +4,8 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  View
+  View,
+  Dimensions
 } from "react-native";
 import { Input, Text } from "native-base";
 import Constants from "./Constants";
@@ -77,7 +78,7 @@ export default class InputWithSuggestions extends Component {
     };
 
     let { content, conditionalLayout } =
-      !isFiltering || query.length < 2
+      !isFiltering || query.length < 3
         ? {
             conditionalLayout: {},
             content: null
@@ -85,7 +86,7 @@ export default class InputWithSuggestions extends Component {
         : {
             conditionalLayout: {
               zIndex: zIndex + 1,
-              borderWidth: 0.5,
+              borderWidth: 0,
               elevation: zIndex + 1,
               height: Math.min(150, suggestionsLayout.height)
             },
@@ -189,7 +190,6 @@ export default class InputWithSuggestions extends Component {
             onSubmitEditing={this._onSubmitEditing.bind(this)}
           />
         </View>
-
         {this._renderSuggestions()}
       </View>
     );
@@ -200,7 +200,9 @@ InputWithSuggestions.defaultProps = {
   options: [],
   renderLabel: option => option,
   renderKey: option => option,
-  onFocus: () => {}
+  onFocus: () => {
+    console.log("On focus is called");
+  }
 };
 
 const styles = StyleSheet.create({
@@ -233,17 +235,16 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline"
   },
   suggestionsContainer: {
-    flex: 1,
-    flexDirection: "row",
-    backgroundColor: "red",
-    position: "absolute",
-    right: 4,
-    left: 4,
-    borderColor: "#8F2692",
-    borderWidth: 0,
-    elevation: 1,
-    borderBottomLeftRadius: 5,
-    borderBottomRightRadius: 5
+    width: Dimensions.get("window").width - 40,
+    // backgroundColor: "red"
+    // position: "absolute",
+    // right: 4,
+    // left: 4,
+    // borderColor: "#8F2692",
+    borderWidth: 0
+    // elevation: 1,
+    // borderBottomLeftRadius: 5,
+    // borderBottomRightRadius: 5
   },
   suggestion: {
     padding: 8,
