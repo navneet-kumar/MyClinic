@@ -77,7 +77,6 @@ export default class AddAppointment extends React.Component {
 
   addAppointment() {
     console.log("submit()");
-    ShowOkAlert(JSON.stringify(this.state.appointment));
   }
 
   updateDateTime(date, time, duration) {
@@ -141,7 +140,6 @@ export default class AddAppointment extends React.Component {
   }
 
   render() {
-    const { query } = this.state;
     return (
       <Container>
         <Header style={{ backgroundColor: Constants.theme_color }}>
@@ -274,7 +272,8 @@ export default class AddAppointment extends React.Component {
                 transparent
                 onPress={() => {
                   this.props.navigation.navigate("setDateTime", {
-                    updateDateTime: this.updateDateTime.bind(this)
+                    updateDateTime: this.updateDateTime.bind(this),
+                    appointment: this.state.appointment
                   });
                 }}
                 style={{

@@ -62,7 +62,7 @@ export default class Website extends React.Component {
             }}
           />
           <ActivityIndicator
-            size={isAndroid ? 100 : "large"}
+            size={isAndroid() ? 100 : "large"}
             color={Constant.theme_color}
             animating={!this.state.isLoaded}
             style={Styles.spinnerLoading}

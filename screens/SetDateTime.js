@@ -25,14 +25,33 @@ export default class SetDateTime extends React.Component {
     header: null
   };
 
+  markedSettings = {
+    selected: true,
+    selectedColor: Constants.theme_color
+  };
+
   constructor(props) {
     super(props);
+    let aptmnt = this.props.navigation.getParam("appointment");
+    let pastScroll =
+      moment(aptmnt.timestamp)
+        .toDate()
+        .getMonth() -
+      moment()
+        .toDate()
+        .getMonth();
+    let futureScroll = Constants.appointment_booking_range - pastScroll;
     this.state = {
       title: Constants.date_time,
-      markedDate: { [moment().format("YYYY-MM-DD")]: { selected: true } },
-      pickedTime: moment().format("hh:mm A"),
-      pickedDate: moment().format("DD/MM/YYYY"),
-      duration: 30
+      selectedTimestamp: aptmnt.timestamp,
+      markedDate: {
+        [moment(aptmnt.timestamp).format("YYYY-MM-DD")]: this.markedSettings
+      },
+      pickedTime: moment(aptmnt.timestamp).format("hh:mm A"),
+      pickedDate: moment(aptmnt.timestamp).format("DD/MM/YYYY"),
+      duration: aptmnt.duration,
+      pastScroll: pastScroll,
+      futureScroll: futureScroll
     };
   }
 
@@ -53,7 +72,9 @@ export default class SetDateTime extends React.Component {
   onDateChange(date) {
     if (typeof date !== undefined) {
       this.setState({
-        markedDate: { [date.dateString]: { selected: true } },
+        markedDate: {
+          [date.dateString]: this.markedSettings
+        },
         pickedDate: moment(new Date(date.dateString)).format("DD/MM/YYYY")
       });
     }
@@ -84,7 +105,7 @@ export default class SetDateTime extends React.Component {
       <Container>
         <Header style={{ backgroundColor: Constants.theme_color }}>
           <Left>
-            <Button transparent onPress={() => this.backToAddAppointment()}>
+            <Button transparent onPress={() => this.props.navigation.goBack()}>
               <Icon
                 name="arrow-back"
                 style={[
@@ -103,13 +124,14 @@ export default class SetDateTime extends React.Component {
         </Header>
         <Content>
           <CalendarList
+            theme={{ todayTextColor: Constants.theme_color }}
             horizontal={true}
             pagingEnabled={true}
             showScrollIndicator={true}
-            pastScrollRange={0}
-            futureScrollRange={Constants.appointment_booking_range}
+            pastScrollRange={this.state.pastScroll}
+            futureScrollRange={this.state.futureScroll}
             markedDates={this.state.markedDate}
-            current={moment().toDate()}
+            current={moment(this.state.selectedTimestamp).format("YYYY-MM-DD")}
             minDate={moment().toDate()}
             onDayPress={this.onDateChange.bind(this)}
           />

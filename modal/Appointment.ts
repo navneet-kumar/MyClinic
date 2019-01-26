@@ -1,4 +1,5 @@
 import Patient from "./Patient";
+import moment from "moment";
 
 export default class Appointment {
   id: string;
@@ -12,8 +13,9 @@ export default class Appointment {
   constructor() {
     this.id = this.uuidv4();
     this.patient = new Patient();
-    this.reminder = 30;
     this.treatment = "Treatment";
+    this.reminder = 30;
+    this.timestamp = moment().toDate();
     this.duration = 30;
   }
 

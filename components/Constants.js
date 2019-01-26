@@ -12,7 +12,7 @@ const Constants = {
   appointment_booking_range: 6,
   time_unit: ["min(s)", "hr(s)"],
   /**
-   * User permissions
+   * User permissions for android
    * permissions["android.permission.CALL_PHONE"]
    * permissions["android.permission.READ_CONTACTS"]
    */
