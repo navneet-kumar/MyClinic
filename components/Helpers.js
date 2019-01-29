@@ -17,12 +17,21 @@ export async function GetAllPermissions() {
   return null;
 }
 
-export async function ShowOkAlert(message) {
+export async function ShowOkAlert(message, onOKPressed) {
   try {
     Alert.alert(
       appName,
       message,
-      [{ text: "OK", onPress: () => console.info("OK Pressed") }],
+      [
+        {
+          text: "OK",
+          onPress: () => {
+            if (typeof onOKPressed === "function") {
+              onOKPressed();
+            }
+          }
+        }
+      ],
       { cancelable: false }
     );
   } catch (err) {

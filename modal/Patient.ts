@@ -1,15 +1,15 @@
 export default class Patient {
-  _id: string;
-  _name: string;
-  _mobile: string;
-  _gender: string;
-  _age: number;
+  id: string;
+  name: string;
+  mobile: string;
+  gender: string;
+  age: number;
 
   constructor() {
-    this._id = this.uuidv4();
-    this._name = "";
-    this._mobile = "";
-    this._gender = "gender";
+    this.id = this.uuidv4();
+    this.name = "";
+    this.mobile = "";
+    this.gender = "gender";
   }
   uuidv4() {
     return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c) {

@@ -6,6 +6,7 @@ import { ShowOkAlert, isAndroid, Warning } from "../components/Helpers";
 import moment from "moment";
 import InputWithSuggestions from "../components/InputWithSuggestions";
 import Contacts from "react-native-contacts";
+import { insertAppointment, getAllAppointment } from "../database/schemas";
 import {
   Container,
   Header,
@@ -42,17 +43,52 @@ export default class AddAppointment extends React.Component {
 
   updateGender(selectedGender) {
     let apnmt = this.state.appointment;
-    apnmt.patient._gender = selectedGender;
+    apnmt.patient.gender = selectedGender;
     this.setState({
       appointment: apnmt
     });
   }
 
+  updateAge(selectedAge) {
+    try {
+      let age = parseInt(selectedAge);
+      let apnmt = this.state.appointment;
+      apnmt.patient.age = age;
+      this.setState({
+        appointment: apnmt
+      });
+    } catch (err) {
+      ShowOkAlert("Only numbers allowed in age.");
+    }
+  }
+
+  resetAddAppointmentForm() {
+    // reset form elements
+    // this._patientName.setNativeProps({ text: "" });
+    this._phoneNumber.setNativeProps({ text: "" });
+    this._age.setNativeProps({ text: "" });
+    Constants.date_time = "Date & Time";
+    this._desc.setNativeProps({ text: "" });
+    this._reminder.setNativeProps({ text: "30" });
+    this.setState({
+      timeUnit: 0,
+      appointment: new Appointment()
+    });
+  }
+
   updateContact(contact) {
     let apnmt = this.state.appointment;
-    apnmt.patient._name = contact.name;
-    apnmt.patient._mobile = contact.number;
-    apnmt.patient._id = contact.id;
+    apnmt.patient.name = contact.name;
+    apnmt.patient.mobile = contact.number;
+    apnmt.patient.id = contact.id;
+    this.setState({
+      appointment: apnmt
+    });
+  }
+
+  updateDesc(desc) {
+    let apnmt = this.state.appointment;
+    apnmt.description = desc;
     this.setState({
       appointment: apnmt
     });
@@ -76,7 +112,10 @@ export default class AddAppointment extends React.Component {
   }
 
   addAppointment() {
-    console.log("submit()");
+    insertAppointment(this.state.appointment).then(() => {
+      ShowOkAlert("Appointment added successfully ..!!");
+      this.resetAddAppointmentForm();
+    });
   }
 
   updateDateTime(date, time, duration) {
@@ -84,7 +123,7 @@ export default class AddAppointment extends React.Component {
 
     // update title to selected date & time
     Constants.date_time = dateTimeStr + " [ " + duration + " min(s) ]";
-    let timestamp = new moment(dateTimeStr, "DD/MM/YYYY, hh:mm A");
+    let timestamp = new moment(dateTimeStr, "DD/MM/YYYY, hh:mm A").toDate();
 
     let apnmt = this.state.appointment;
     apnmt.duration = duration;
@@ -184,8 +223,9 @@ export default class AddAppointment extends React.Component {
                 placeholder="Mobile Number"
                 keyboardType="numeric"
                 maxLength={15}
+                ref={phoneNumber => (this._phoneNumber = phoneNumber)}
                 placeholderTextColor={Constants.theme_color}
-                defaultValue={this.state.appointment.patient._mobile}
+                defaultValue={this.state.appointment.patient.mobile}
               />
             </Item>
             <Item style={{ flex: 3 }}>
@@ -201,7 +241,7 @@ export default class AddAppointment extends React.Component {
                   iosIcon={
                     <Icon style={Styles.iconStyle} name="ios-arrow-down" />
                   }
-                  selectedValue={this.state.appointment.patient._gender}
+                  selectedValue={this.state.appointment.patient.gender}
                   onValueChange={this.updateGender.bind(this)}
                 >
                   <Picker.Item
@@ -232,6 +272,10 @@ export default class AddAppointment extends React.Component {
                   keyboardType="numeric"
                   maxLength={2}
                   placeholderTextColor={Constants.theme_color}
+                  ref={age => (this._age = age)}
+                  onChangeText={inputAge => {
+                    this.updateAge(inputAge);
+                  }}
                 />
               </Item>
             </Item>
@@ -302,6 +346,7 @@ export default class AddAppointment extends React.Component {
                 <Input
                   selectTextOnFocus
                   defaultValue={Constants.reminder + ""}
+                  ref={reminder => (this._reminder = reminder)}
                   keyboardType="numeric"
                   maxLength={2}
                   placeholderTextColor={Constants.theme_color}
@@ -326,6 +371,10 @@ export default class AddAppointment extends React.Component {
                 placeholder="Additional case information, if available."
                 placeholderTextColor={Constants.theme_color}
                 style={{ color: Constants.theme_color }}
+                ref={desc => (this._desc = desc)}
+                onChangeText={desc => {
+                  this.updateDesc(desc);
+                }}
               />
             </Item>
             <Item style={{ paddingTop: 30, alignSelf: "center" }}>
