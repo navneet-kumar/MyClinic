@@ -1,5 +1,5 @@
-import Patient from "./Patient";
 import moment from "moment";
+import Patient from "./Patient";
 
 export default class Appointment {
   id: string;

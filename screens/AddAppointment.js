@@ -1,30 +1,28 @@
-import React from "react";
-import Styles from "../components/Style";
-import Constants from "../components/Constants";
-import Appointment from "../modal/Appointment.ts";
-import { ShowOkAlert, isAndroid, Warning } from "../components/Helpers";
 import moment from "moment";
-import InputWithSuggestions from "../components/InputWithSuggestions";
-import Contacts from "react-native-contacts";
-import { insertAppointment, getAllAppointment } from "../database/schemas";
 import {
+  Body,
+  Button,
   Container,
-  Header,
   Content,
   Form,
-  Item,
-  Input,
-  Title,
+  Header,
   Icon,
+  Input,
+  Item,
+  Label,
   Left,
-  Right,
-  Body,
   Picker,
-  Textarea,
-  Button,
+  Right,
   Text,
-  Label
+  Textarea,
+  Title
 } from "native-base";
+import React from "react";
+import Constants from "../components/Constants";
+import { ShowOkAlert } from "../components/Helpers";
+import MyContacts from "../components/MyContacts";
+import Styles from "../components/Style";
+import Appointment from "../modal/Appointment.ts";
 
 export default class AddAppointment extends React.Component {
   static navigationOptions = {
@@ -33,12 +31,16 @@ export default class AddAppointment extends React.Component {
 
   constructor(props) {
     super(props);
+    this.updateContact = this.updateContact.bind(this);
     this.state = {
       timeUnit: 0,
-      loading: true,
-      appointment: new Appointment(),
-      contacts: []
+      isLoading: true,
+      appointment: new Appointment()
     };
+  }
+
+  async componentWillMount() {
+    this.setState({ isLoading: false });
   }
 
   updateGender(selectedGender) {
@@ -60,20 +62,6 @@ export default class AddAppointment extends React.Component {
     } catch (err) {
       ShowOkAlert("Only numbers allowed in age.");
     }
-  }
-
-  resetAddAppointmentForm() {
-    // reset form elements
-    // this._patientName.setNativeProps({ text: "" });
-    this._phoneNumber.setNativeProps({ text: "" });
-    this._age.setNativeProps({ text: "" });
-    Constants.date_time = "Date & Time";
-    this._desc.setNativeProps({ text: "" });
-    this._reminder.setNativeProps({ text: "30" });
-    this.setState({
-      timeUnit: 0,
-      appointment: new Appointment()
-    });
   }
 
   updateContact(contact) {
@@ -111,13 +99,6 @@ export default class AddAppointment extends React.Component {
     });
   }
 
-  addAppointment() {
-    insertAppointment(this.state.appointment).then(() => {
-      ShowOkAlert("Appointment added successfully ..!!");
-      this.resetAddAppointmentForm();
-    });
-  }
-
   updateDateTime(date, time, duration) {
     let dateTimeStr = date + ", " + time;
 
@@ -134,51 +115,29 @@ export default class AddAppointment extends React.Component {
     });
   }
 
-  getAllContacts() {
-    let getContacts = true;
-    var contactList = [];
-
-    if (isAndroid()) {
-      if (
-        Constants.permissions["android.permission.READ_CONTACTS"] !== "granted"
-      ) {
-        getContacts = false;
-        ShowOkAlert(
-          "Please allow us to read your contacts and help us give you a better experience."
-        );
-      }
-    }
-
-    if (getContacts) {
-      Contacts.getAll((err, contacts) => {
-        if (err) {
-          Warning(err);
-        } else if (contacts.length > 0) {
-          for (var i in contacts) {
-            try {
-              contactList.push({
-                id: contacts[i].recordID,
-                name:
-                  (contacts[i].givenName || "") +
-                  " " +
-                  (contacts[i].familyName || ""),
-                number: contacts[i].phoneNumbers[0].number
-              });
-            } catch (err) {
-              Warning(err);
-            }
-          }
-        }
-      });
-    }
-    return contactList;
+  resetAddAppointmentForm() {
+    // reset form elements
+    this._patientName.setNativeProps({ text: "" });
+    this._phoneNumber.setNativeProps({ text: "" });
+    this._age.setNativeProps({ text: "" });
+    Constants.date_time = "Date & Time";
+    this._desc.setNativeProps({ text: "" });
+    this._reminder.setNativeProps({ text: "30" });
+    this.setState({
+      timeUnit: 0,
+      appointment: new Appointment()
+    });
   }
 
-  async componentWillMount() {
-    this.setState({ loading: false, contacts: this.getAllContacts() });
+  addAppointment() {
+    insertAppointment(this.state.appointment).then(() => {
+      ShowOkAlert("Appointment added successfully ..!!");
+      this.resetAddAppointmentForm();
+    });
   }
 
   render() {
+    const { selectedItems } = this.state;
     return (
       <Container>
         <Header style={{ backgroundColor: Constants.theme_color }}>
@@ -203,19 +162,15 @@ export default class AddAppointment extends React.Component {
           <Form>
             <Item>
               <Icon name="person" style={Styles.iconStyle} />
-              <InputWithSuggestions
+              <Input
                 placeholder="Patient Name"
-                options={this.state.contacts}
-                renderLabel={c => {
-                  return c.name;
-                }}
-                renderKey={c => {
-                  return c.id;
-                }}
-                onSelectOption={c => {
-                  this.updateContact(c);
-                }}
+                autoCorrect={false}
+                ref={patientName => (this._patientName = patientName)}
+                placeholderTextColor={Constants.theme_color}
+                style={{ color: Constants.theme_color }}
+                defaultValue={this.state.appointment.patient.name}
               />
+              <MyContacts onContactSelected={this.updateContact} />
             </Item>
             <Item>
               <Icon name="call" style={Styles.iconStyle} />
@@ -223,6 +178,7 @@ export default class AddAppointment extends React.Component {
                 placeholder="Mobile Number"
                 keyboardType="numeric"
                 maxLength={15}
+                style={{ color: Constants.theme_color }}
                 ref={phoneNumber => (this._phoneNumber = phoneNumber)}
                 placeholderTextColor={Constants.theme_color}
                 defaultValue={this.state.appointment.patient.mobile}

@@ -1,6 +1,12 @@
+import { isAndroid } from "./Helpers";
+
 const Constants = {
   theme_color: "#6a51ae",
   theme_compliment_color: "#ffffff",
+  font: {
+    fontFamily: isAndroid() ? "Roboto" : "System",
+    fontSize: 15
+  },
   website_url: "http://www.teethnbeauty.com/",
   icon_size: 10,
   date_time: "Date & Time",

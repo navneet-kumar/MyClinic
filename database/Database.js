@@ -1,11 +1,8 @@
+import { Text } from "native-base";
 import React from "react";
 import Realm from "realm";
-import {
-  Appointment as AppointmentSchema,
-  Patient as PatientSchema
-} from "./schemas";
 import Patient from "../modal/Patient";
-import { Text } from "native-base";
+import { Patient as PatientSchema } from "./schemas";
 
 export default class Database extends React.Component {
   constructor(props) {

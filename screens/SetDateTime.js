@@ -1,24 +1,24 @@
-import React from "react";
-import Constants from "../components/Constants";
-import Styles from "../components/Style";
-import { CalendarList } from "react-native-calendars";
-import TimePicker from "react-native-datepicker";
 import moment from "moment";
 import {
-  Container,
-  Header,
-  Content,
-  Title,
-  Icon,
-  Left,
-  Right,
   Body,
   Button,
-  Text,
+  Container,
+  Content,
+  Header,
+  Icon,
   Item,
+  Label,
+  Left,
   Picker,
-  Label
+  Right,
+  Text,
+  Title
 } from "native-base";
+import React from "react";
+import { CalendarList } from "react-native-calendars";
+import TimePicker from "react-native-datepicker";
+import Constants from "../components/Constants";
+import Styles from "../components/Style";
 
 export default class SetDateTime extends React.Component {
   static navigationOptions = {

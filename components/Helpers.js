@@ -1,6 +1,5 @@
-import { PermissionsAndroid } from "react-native";
+import { Alert, PermissionsAndroid, Platform } from "react-native";
 import { name as appName } from "../app.json";
-import { Alert, Platform } from "react-native";
 
 export async function GetAllPermissions() {
   try {
@@ -44,12 +43,14 @@ export function isAndroid() {
 }
 
 export function Warning(error) {
-  console.warn(
-    error.message +
+  let msg = error.message;
+  if (error.fileName) {
+    msg +=
       " @fileName:lineNumber [ " +
       error.fileName +
       ":" +
       error.lineNumber +
-      " ]"
-  );
+      " ]";
+  }
+  console.warn(msg);
 }

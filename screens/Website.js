@@ -1,18 +1,18 @@
-import React from "react";
-import { WebView, ActivityIndicator } from "react-native";
-import Styles from "../components/Style";
-import Constant from "../components/Constants";
-import { ShowOkAlert, isAndroid } from "../components/Helpers";
 import {
+  Body,
   Container,
-  Header,
   Content,
-  Title,
+  Header,
+  Icon,
   Left,
   Right,
-  Body,
-  Icon
+  Title
 } from "native-base";
+import React from "react";
+import { ActivityIndicator, WebView } from "react-native";
+import Constant from "../components/Constants";
+import { isAndroid, ShowOkAlert } from "../components/Helpers";
+import Styles from "../components/Style";
 
 export default class Website extends React.Component {
   static navigationOptions = {
@@ -56,6 +56,9 @@ export default class Website extends React.Component {
             source={{ uri: Constant.website_url }}
             onError={() => {
               ShowOkAlert("Error occured while loading your website..!");
+            }}
+            renderError={err => {
+              ShowOkAlert("Error occured while loading your website..! ");
             }}
             onLoadEnd={() => {
               this.setState({ isLoaded: true });
