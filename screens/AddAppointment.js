@@ -22,6 +22,7 @@ import Constants from "../components/Constants";
 import { ShowOkAlert } from "../components/Helpers";
 import MyContacts from "../components/MyContacts";
 import Styles from "../components/Style";
+import { insertAppointment } from "../database/Database";
 import Appointment from "../modal/Appointment.ts";
 
 export default class AddAppointment extends React.Component {
@@ -31,7 +32,7 @@ export default class AddAppointment extends React.Component {
 
   constructor(props) {
     super(props);
-    this.updateContact = this.updateContact.bind(this);
+    this.updatePatientDetails = this.updatePatientDetails.bind(this);
     this.state = {
       timeUnit: 0,
       isLoading: true,
@@ -64,11 +65,13 @@ export default class AddAppointment extends React.Component {
     }
   }
 
-  updateContact(contact) {
+  updatePatientDetails(patient) {
     let apnmt = this.state.appointment;
-    apnmt.patient.name = contact.name;
-    apnmt.patient.mobile = contact.number;
-    apnmt.patient.id = contact.id;
+    apnmt.patient.name = patient.name;
+    apnmt.patient.mobile = patient.mobile;
+    apnmt.patient.id = patient.id;
+    apnmt.patient.age = patient.age;
+    apnmt.patient.gender = patient.gender;
     this.setState({
       appointment: apnmt
     });
@@ -170,7 +173,7 @@ export default class AddAppointment extends React.Component {
                 style={{ color: Constants.theme_color }}
                 defaultValue={this.state.appointment.patient.name}
               />
-              <MyContacts onContactSelected={this.updateContact} />
+              <MyContacts onContactSelected={this.updatePatientDetails} />
             </Item>
             <Item>
               <Icon name="call" style={Styles.iconStyle} />

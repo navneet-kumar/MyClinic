@@ -4,6 +4,7 @@ import { TouchableOpacity } from "react-native";
 import Contacts from "react-native-contacts";
 import SectionedMultiSelect from "react-native-sectioned-multi-select";
 import { isAndroid, ShowOkAlert, Warning } from "../components/Helpers";
+import { getAllPatients, insertPatients } from "../database/Database";
 import Constants from "./Constants";
 import Styles from "./Style";
 
@@ -12,37 +13,45 @@ class MyContacts extends Component {
     super(props);
     this.state = {
       isLoading: true,
-      contacts: [],
-      selectedItems: []
+      contacts: []
     };
   }
   componentWillMount() {
-    this.setState({ contacts: this.getAllContacts() });
+    if (this.state.contacts.length === 0) {
+      getAllPatients().then(patients => {
+        this.setState({ isLoading: false, contacts: patients });
+      });
+    }
+    // if (this.state.contacts.length === 0) {
+    //   this.syncPhoneContacts();
+    // }
   }
 
-  getAllContacts() {
-    let getContacts = true;
-    var contactList = [];
+  syncPhoneContacts() {
+    let isAllowedToReadContacts = true;
+    let contactList = [];
 
+    // check if permissions are granted to read contacts
     if (isAndroid()) {
       if (
         Constants.permissions["android.permission.READ_CONTACTS"] !== "granted"
       ) {
-        getContacts = false;
+        isAllowedToReadContacts = false;
         ShowOkAlert(
           "Please allow us to read your contacts and help us give you a better experience."
         );
       }
     }
 
-    if (getContacts) {
+    // if allowed read the contacts and push it to database
+    if (isAllowedToReadContacts) {
       Contacts.getAll((err, contacts) => {
         if (err) {
           Warning(err);
         } else if (contacts.length > 0) {
           for (var i in contacts) {
             try {
-              contactList.push({
+              size = contactList.push({
                 id: contacts[i].recordID,
                 name:
                   (contacts[i].givenName || "") +
@@ -54,11 +63,14 @@ class MyContacts extends Component {
               Warning(err);
             }
           }
+          this.setState({ isLoading: false });
+          insertPatients(contactList).then(count => {
+            ShowOkAlert(count + " contacts synced successfully !");
+          });
+          return contactList;
         }
       });
     }
-    this.setState({ isLoading: false });
-    return contactList;
   }
 
   render() {
