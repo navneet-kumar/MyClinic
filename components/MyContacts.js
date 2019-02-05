@@ -1,10 +1,11 @@
-import { Icon, Item } from "native-base";
+import { Icon, Item, Text } from "native-base";
 import React, { Component } from "react";
 import { TouchableOpacity } from "react-native";
 import Contacts from "react-native-contacts";
 import SectionedMultiSelect from "react-native-sectioned-multi-select";
 import { isAndroid, ShowOkAlert, Warning } from "../components/Helpers";
 import { getAllPatients, insertPatients } from "../database/Database";
+import Patient from "../modal/Patient";
 import Constants from "./Constants";
 import Styles from "./Style";
 
@@ -22,12 +23,11 @@ class MyContacts extends Component {
         this.setState({ isLoading: false, contacts: patients });
       });
     }
-    // if (this.state.contacts.length === 0) {
-    //   this.syncPhoneContacts();
-    // }
   }
 
   syncPhoneContacts() {
+    this.setState({ isLoading: true });
+
     let isAllowedToReadContacts = true;
     let contactList = [];
 
@@ -51,30 +51,28 @@ class MyContacts extends Component {
         } else if (contacts.length > 0) {
           for (var i in contacts) {
             try {
-              size = contactList.push({
-                id: contacts[i].recordID,
-                name:
-                  (contacts[i].givenName || "") +
-                  " " +
-                  (contacts[i].familyName || ""),
-                number: contacts[i].phoneNumbers[0].number
-              });
+              let patient = new Patient();
+              patient.id = contacts[i].recordID;
+              patient.name =
+                (contacts[i].givenName || "") +
+                " " +
+                (contacts[i].familyName || "");
+              patient.mobile = contacts[i].phoneNumbers[0].number;
+              contactList.push(patient);
             } catch (err) {
               Warning(err);
             }
           }
-          this.setState({ isLoading: false });
           insertPatients(contactList).then(count => {
             ShowOkAlert(count + " contacts synced successfully !");
           });
-          return contactList;
+          this.setState({ isLoading: false, contacts: contactList });
         }
       });
     }
   }
 
   render() {
-    const { selectedItems } = this.state;
     return (
       <Item style={{ borderColor: "transparent" }}>
         <SectionedMultiSelect
@@ -130,6 +128,35 @@ class MyContacts extends Component {
                   style={Styles.iconStyle}
                 />
               </TouchableOpacity>
+            </Item>
+          }
+          stickyFooterComponent={
+            <Item
+              style={{
+                padding: 8,
+                backgroundColor: Constants.theme_color,
+                justifyContent: "center"
+              }}
+              onPress={() => {
+                this._sectionedMultiSelect._toggleSelector();
+                this.syncPhoneContacts();
+              }}
+            >
+              <Icon
+                type="MaterialIcons"
+                name="sync"
+                style={[
+                  Styles.iconStyle,
+                  { color: Constants.theme_compliment_color }
+                ]}
+              />
+              <Text
+                style={{
+                  color: Constants.theme_compliment_color
+                }}
+              >
+                sync contacts
+              </Text>
             </Item>
           }
         />

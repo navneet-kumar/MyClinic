@@ -1,19 +1,20 @@
 import Realm from "realm";
 
-export const patient_schema = "patient_schema";
-export const appointment_schema = "appointment_schema";
+export const database_name = "MyClinic.realm";
+export const patient_table_name = "patient";
+export const appointment_table_name = "appointment";
 
 /*********************************/
 /**
  * DataBase schema description
  */
 /*********************************/
-export const Appointment = {
-  name: "appointment_schema",
+export const AppointmentSchema = {
+  name: appointment_table_name,
   primaryKey: "id",
   properties: {
     id: "string",
-    patient: "patient_schema",
+    patient: patient_table_name,
     treatment: "string?",
     description: "string?",
     reminder: { type: "int", default: 30 },
@@ -22,8 +23,8 @@ export const Appointment = {
   }
 };
 
-export const Patient = {
-  name: "patient_schema",
+export const PatientSchema = {
+  name: patient_table_name,
   primaryKey: "id",
   properties: {
     id: "string",
@@ -39,8 +40,8 @@ export const Patient = {
  */
 /*********************************/
 const databaseOptions = {
-  path: "MyClinic.realm",
-  schema: [Patient, Appointment],
+  path: database_name,
+  schema: [AppointmentSchema, PatientSchema],
   schemaVersion: 0
 };
 
@@ -53,7 +54,7 @@ export const getAllAppointment = () =>
     Realm.open(databaseOptions)
       .then(realm => {
         realm.write(() => {
-          let appointments = realm.objects(appointment_schema);
+          let appointments = realm.objects(appointment_table_name);
           resolve(appointments);
         });
       })
@@ -69,7 +70,7 @@ export const insertAppointment = appointment =>
     Realm.open(databaseOptions)
       .then(realm => {
         realm.write(() => {
-          realm.create(appointment_schema, appointment);
+          realm.create(appointment_table_name, appointment, true);
           resolve(appointment);
         });
       })
@@ -86,7 +87,7 @@ export const updateAppointment = appointment =>
       .then(realm => {
         realm.write(() => {
           let appointmentToBeUpdated = realm.objectForPrimaryKey(
-            appointment_schema,
+            appointment_table_name,
             appointment.id
           );
           appointmentToBeUpdated.patient = appointment.patient;
@@ -111,7 +112,7 @@ export const deleteAppointment = appointmentId =>
       .then(realm => {
         realm.write(() => {
           let appointmentToBeDeleted = realm.objectForPrimaryKey(
-            appointment_schema,
+            appointment_table_name,
             appointmentId
           );
           realm.delete(appointmentToBeDeleted);
@@ -129,7 +130,7 @@ export const getAllPatients = () =>
     Realm.open(databaseOptions)
       .then(realm => {
         realm.write(() => {
-          let patients = realm.objects(patient_schema);
+          let patients = realm.objects(patient_table_name);
           resolve(Array.from(patients));
         });
       })
@@ -145,7 +146,7 @@ export const insertPatient = patient =>
     Realm.open(databaseOptions)
       .then(realm => {
         realm.write(() => {
-          realm.create(patient_schema, patient);
+          realm.create(patient_table_name, patient);
           resolve(appointment);
         });
       })
@@ -162,17 +163,29 @@ export const insertPatients = patients =>
       .then(realm => {
         patients.map(patient => {
           realm.write(() => {
-            console.log(patient);
-            realm.create(patient_schema, {
-              id: patient.id,
-              name: patient.name,
-              mobile: patient.number,
-              gender: null,
-              age: null
-            });
+            realm.create(patient_table_name, patient);
           });
         });
         resolve(patients.length);
+      })
+      .catch(error => reject(error));
+  });
+
+export const updatePatient = patient =>
+  new Promise((resolve, reject) => {
+    Realm.open(databaseOptions)
+      .then(realm => {
+        realm.write(() => {
+          let patientToBeUpdated = realm.objectForPrimaryKey(
+            patient_table_name,
+            patient.id
+          );
+          patientToBeUpdated.name = patient.name;
+          patientToBeUpdated.mobile = patient.mobile;
+          patientToBeUpdated.gender = patient.gender;
+          patientToBeUpdated.age = patient.age;
+          resolve(patient);
+        });
       })
       .catch(error => reject(error));
   });

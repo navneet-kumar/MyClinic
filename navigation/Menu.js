@@ -1,16 +1,16 @@
-import React from "react";
 import { Icon } from "native-base";
-import Website from "../screens/Website";
-import AddAppointment from "../screens/AddAppointment";
-import TodaysAppointment from "../screens/TodaysAppointment";
-import SetDateTime from "../screens/SetDateTime";
-import Constant from "../components/Constants";
+import React from "react";
 import {
   createAppContainer,
   createBottomTabNavigator,
-  TabBarBottom,
-  createStackNavigator
+  createStackNavigator,
+  TabBarBottom
 } from "react-navigation";
+import Calendar from "../components/Calendar";
+import Constant from "../components/Constants";
+import AddAppointment from "../screens/AddAppointment";
+import TodaysAppointment from "../screens/TodaysAppointment";
+import Website from "../screens/Website";
 
 const AddAppointmentStackNavigator = createStackNavigator(
   {
@@ -18,7 +18,7 @@ const AddAppointmentStackNavigator = createStackNavigator(
       screen: AddAppointment
     },
     setDateTime: {
-      screen: SetDateTime
+      screen: Calendar
     }
   },
   {}

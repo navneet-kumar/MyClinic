@@ -17,10 +17,10 @@ import {
 import React from "react";
 import { CalendarList } from "react-native-calendars";
 import TimePicker from "react-native-datepicker";
-import Constants from "../components/Constants";
-import Styles from "../components/Style";
+import Constants from "./Constants";
+import Styles from "./Style";
 
-export default class SetDateTime extends React.Component {
+export default class Calendar extends React.Component {
   static navigationOptions = {
     header: null
   };

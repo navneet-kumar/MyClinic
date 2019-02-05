@@ -44,6 +44,22 @@ export default class AddAppointment extends React.Component {
     this.setState({ isLoading: false });
   }
 
+  updatePatientName(patientName) {
+    let apnmt = this.state.appointment;
+    apnmt.patient.name = patientName;
+    this.setState({
+      appointment: apnmt
+    });
+  }
+
+  updatePatientMobile(mobile) {
+    let apnmt = this.state.appointment;
+    apnmt.patient.mobile = mobile;
+    this.setState({
+      appointment: apnmt
+    });
+  }
+
   updateGender(selectedGender) {
     let apnmt = this.state.appointment;
     apnmt.patient.gender = selectedGender;
@@ -130,17 +146,86 @@ export default class AddAppointment extends React.Component {
       timeUnit: 0,
       appointment: new Appointment()
     });
-  }
 
-  addAppointment() {
-    insertAppointment(this.state.appointment).then(() => {
-      ShowOkAlert("Appointment added successfully ..!!");
-      this.resetAddAppointmentForm();
+    // reset error icons
+    this._patientNameIcon.setNativeProps({
+      style: {
+        color: Constants.theme_color
+      }
+    });
+    this._patientPhoneIcon.setNativeProps({
+      style: {
+        color: Constants.theme_color
+      }
+    });
+    this._dateTimeIcon.setNativeProps({
+      style: {
+        color: Constants.theme_color
+      }
     });
   }
 
+  validateFields() {
+    const { patient, timestamp } = this.state.appointment;
+    if (!patient.name) {
+      this._patientNameIcon.setNativeProps({
+        style: {
+          color: Constants.theme_color_error
+        }
+      });
+      this._patientName._root.focus();
+      return false;
+    } else {
+      this._patientNameIcon.setNativeProps({
+        style: {
+          color: Constants.theme_color
+        }
+      });
+    }
+
+    if (!patient.mobile) {
+      this._patientPhoneIcon.setNativeProps({
+        style: {
+          color: Constants.theme_color_error
+        }
+      });
+      this._phoneNumber._root.focus();
+      return false;
+    } else {
+      this._patientPhoneIcon.setNativeProps({
+        style: {
+          color: Constants.theme_color
+        }
+      });
+    }
+
+    if (!timestamp) {
+      this._dateTimeIcon.setNativeProps({
+        style: {
+          color: Constants.theme_color_error
+        }
+      });
+      return false;
+    } else {
+      this._dateTimeIcon.setNativeProps({
+        style: {
+          color: Constants.theme_color
+        }
+      });
+    }
+    return true;
+  }
+
+  addAppointment() {
+    if (this.validateFields()) {
+      insertAppointment(this.state.appointment).then(() => {
+        ShowOkAlert("Appointment added successfully ..!!");
+        this.resetAddAppointmentForm();
+      });
+    }
+  }
+
   render() {
-    const { selectedItems } = this.state;
     return (
       <Container>
         <Header style={{ backgroundColor: Constants.theme_color }}>
@@ -159,24 +244,53 @@ export default class AddAppointment extends React.Component {
               Add Appointment
             </Title>
           </Body>
-          <Right />
+          <Right>
+            <Icon
+              type="MaterialCommunityIcons"
+              name="broom"
+              style={[
+                Styles.iconStyle,
+                { color: Constants.theme_compliment_color }
+              ]}
+              onPress={() => {
+                this.resetAddAppointmentForm();
+              }}
+            />
+          </Right>
         </Header>
         <Content>
           <Form>
             <Item>
-              <Icon name="person" style={Styles.iconStyle} />
+              <Icon
+                name="person"
+                style={Styles.iconStyle}
+                ref={pni => {
+                  this._patientNameIcon = pni;
+                }}
+              />
               <Input
                 placeholder="Patient Name"
                 autoCorrect={false}
-                ref={patientName => (this._patientName = patientName)}
+                ref={patientName => {
+                  this._patientName = patientName;
+                }}
                 placeholderTextColor={Constants.theme_color}
                 style={{ color: Constants.theme_color }}
-                defaultValue={this.state.appointment.patient.name}
+                value={this.state.appointment.patient.name}
+                onChangeText={name => {
+                  this.updatePatientName(name);
+                }}
               />
               <MyContacts onContactSelected={this.updatePatientDetails} />
             </Item>
             <Item>
-              <Icon name="call" style={Styles.iconStyle} />
+              <Icon
+                name="call"
+                style={Styles.iconStyle}
+                ref={pph => {
+                  this._patientPhoneIcon = pph;
+                }}
+              />
               <Input
                 placeholder="Mobile Number"
                 keyboardType="numeric"
@@ -184,7 +298,10 @@ export default class AddAppointment extends React.Component {
                 style={{ color: Constants.theme_color }}
                 ref={phoneNumber => (this._phoneNumber = phoneNumber)}
                 placeholderTextColor={Constants.theme_color}
-                defaultValue={this.state.appointment.patient.mobile}
+                value={this.state.appointment.patient.mobile}
+                onChangeText={mobile => {
+                  this.updatePatientMobile(mobile);
+                }}
               />
             </Item>
             <Item style={{ flex: 3 }}>
@@ -230,6 +347,7 @@ export default class AddAppointment extends React.Component {
                   placeholder="Age"
                   keyboardType="numeric"
                   maxLength={2}
+                  style={{ color: Constants.theme_color }}
                   placeholderTextColor={Constants.theme_color}
                   ref={age => (this._age = age)}
                   onChangeText={inputAge => {
@@ -270,6 +388,9 @@ export default class AddAppointment extends React.Component {
                 type="FontAwesome"
                 name="calendar"
                 style={Styles.iconStyle}
+                ref={dti => {
+                  this._dateTimeIcon = dti;
+                }}
               />
               <Button
                 transparent
