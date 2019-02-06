@@ -12,21 +12,13 @@ import {
 } from "native-base";
 import React from "react";
 import { FlatList } from "react-native";
-import AppointmentCard from "../components/AppointmentCard";
+import Appointment from "../components/Appointment";
 import Constant from "../components/Constants";
 import { GetAllPermissions } from "../components/Helpers";
 import Styles from "../components/Style";
-
-const appointments = [];
+import { getAllAppointment } from "../database/Database";
 
 export default class TodaysAppointment extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      listViewData: appointments
-    };
-  }
-
   async componentWillMount() {
     // get all desired permissions
     GetAllPermissions().then(data => {
@@ -56,13 +48,14 @@ export default class TodaysAppointment extends React.Component {
           <Right />
         </Header>
         <Content
+          padder
           contentContainerStyle={{
             flex: 1,
             justifyContent: "center",
             borderColor: "transparent"
           }}
         >
-          <ShowAppointments appointments={appointments} />
+          <ShowAppointments />
         </Content>
       </Container>
     );
@@ -73,34 +66,49 @@ class ShowAppointments extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      enable: true
+      isLoading: false,
+      appointments: []
     };
   }
+
+  componentDidMount() {
+    this.todaysAppointment();
+  }
+
+  onRefresh() {
+    this.setState({ isFetching: true });
+    this.todaysAppointment();
+  }
+
+  todaysAppointment() {
+    getAllAppointment().then(appointments => {
+      this.setState({ isFetching: false, appointments: appointments });
+    });
+  }
+
   renderItem(item) {
     return (
-      <AppointmentCard
-        name={item.name}
-        mobile={item.mobile}
-        age={item.age}
-        gender={item.gender}
+      <Appointment
+        id={item.id}
+        name={item.patient.name}
+        mobile={item.patient.mobile}
+        age={item.patient.age}
+        gender={item.patient.gender}
         description={item.description}
+        treatment={item.treatment}
       />
     );
   }
 
-  setScrollEnabled(enable) {
-    this.setState({
-      enable
-    });
-  }
-
   render() {
-    if (this.props.appointments.length > 0) {
+    if (this.state.appointments.length > 0) {
       return (
         <FlatList
-          data={this.props.appointments}
+          data={this.state.appointments}
           keyExtractor={(item, index) => index.toString()}
           renderItem={({ item }) => this.renderItem(item)}
+          onRefresh={() => this.onRefresh()}
+          refreshing={this.state.isLoading}
         />
       );
     } else {

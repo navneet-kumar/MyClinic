@@ -55,7 +55,7 @@ export const getAllAppointment = () =>
       .then(realm => {
         realm.write(() => {
           let appointments = realm.objects(appointment_table_name);
-          resolve(appointments);
+          resolve(Array.from(appointments));
         });
       })
       .catch(error => reject(error));
