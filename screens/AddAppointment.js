@@ -45,6 +45,7 @@ export default class AddAppointment extends React.Component {
   }
 
   updatePatientName(patientName) {
+    // let patient = Object.assign({}, this.state.appointment.patient, {name: patientName});
     let apnmt = this.state.appointment;
     apnmt.patient.name = patientName;
     this.setState({

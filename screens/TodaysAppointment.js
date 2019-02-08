@@ -67,12 +67,8 @@ class ShowAppointments extends React.Component {
     super(props);
     this.state = {
       isLoading: false,
-      appointments: []
+      appointments: this.todaysAppointment()
     };
-  }
-
-  componentDidMount() {
-    this.todaysAppointment();
   }
 
   onRefresh() {
@@ -100,19 +96,9 @@ class ShowAppointments extends React.Component {
     );
   }
 
-  render() {
-    if (this.state.appointments.length > 0) {
-      return (
-        <FlatList
-          data={this.state.appointments}
-          keyExtractor={(item, index) => index.toString()}
-          renderItem={({ item }) => this.renderItem(item)}
-          onRefresh={() => this.onRefresh()}
-          refreshing={this.state.isLoading}
-        />
-      );
-    } else {
-      return (
+  NoAppointmentMessage() {
+    return (
+      <Body style={{ paddingTop: "50%" }}>
         <Item style={{ flexDirection: "column", borderColor: "transparent" }}>
           <Item style={{ borderColor: "transparent" }}>
             <Icon
@@ -127,7 +113,20 @@ class ShowAppointments extends React.Component {
             </Text>
           </Item>
         </Item>
-      );
-    }
+      </Body>
+    );
+  }
+
+  render() {
+    return (
+      <FlatList
+        data={this.state.appointments}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({ item }) => this.renderItem(item)}
+        onRefresh={() => this.onRefresh()}
+        refreshing={this.state.isLoading}
+        ListEmptyComponent={this.NoAppointmentMessage()}
+      />
+    );
   }
 }

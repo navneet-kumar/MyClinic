@@ -3,7 +3,7 @@ import { isAndroid } from "./Helpers";
 const Constants = {
   theme_color: "#6a51ae",
   theme_compliment_color: "#ffffff",
-  theme_color_error: "#ff0033",
+  theme_color_error: "#cc0000",
   font: {
     fontFamily: isAndroid() ? "Roboto" : "System",
     fontSize: 15
