@@ -1,8 +1,9 @@
-import { Button, Card, CardItem, Icon, Left, Right, Text } from "native-base";
+import { Card, CardItem, Icon, Left, Right, Text } from "native-base";
 import PropTypes from "prop-types";
 import React from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, TouchableOpacity } from "react-native";
 import Constants from "./Constants";
+import { call, positiveNegativeNeutralAlert, sms } from "./Helpers";
 import Styles from "./Style";
 
 const PatientName = props => {
@@ -18,19 +19,35 @@ const PatientName = props => {
   }
 };
 
+function onContactPress(name, contactNo) {
+  positiveNegativeNeutralAlert(
+    "Select action for patient '" + name + "' \n " + contactNo,
+    "call",
+    "send sms",
+    "cancel",
+    () => call(contactNo),
+    () => sms(contactNo, Constants.myclinic_address)
+  );
+}
+
 const PatientPhone = props => {
   if (props.mobile) {
     return (
       <Left>
-        <Button light iconLeft style={style.button}>
+        <TouchableOpacity
+          style={{ flex: 1, flexDirection: "row" }}
+          onPress={() => {
+            onContactPress(props.name, props.mobile);
+          }}
+        >
+          <Icon name="call" style={[Styles.iconStyle, { paddingRight: 10 }]} />
           <Icon
             name="message-text"
             type="MaterialCommunityIcons"
             style={Styles.iconStyle}
           />
-          <Icon name="call" style={Styles.iconStyle} />
           <Text style={{ color: Constants.theme_color }}>{props.mobile}</Text>
-        </Button>
+        </TouchableOpacity>
       </Left>
     );
   } else {
@@ -102,7 +119,7 @@ export default class Appointment extends React.Component {
           </Right>
         </CardItem>
         <CardItem style={style.cardRow}>
-          <PatientPhone mobile={this.props.mobile} />
+          <PatientPhone mobile={this.props.mobile} name={this.props.name} />
           <Left style={{ flex: 0 }}>
             <PatientGender gender={this.props.gender} />
             <PatientAge age={this.props.age} />

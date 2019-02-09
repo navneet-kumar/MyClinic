@@ -3,6 +3,8 @@ package com.myclinic;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.tkporter.sendsms.SendSMSPackage;
+import com.github.wumke.RNImmediatePhoneCall.RNImmediatePhoneCallPackage;
 import io.realm.react.RealmReactPackage;
 import com.rt2zz.reactnativecontacts.ReactNativeContacts;
 import com.oblador.vectoricons.VectorIconsPackage;
@@ -27,6 +29,8 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            SendSMSPackage.getInstance(),
+            new RNImmediatePhoneCallPackage(),
             new RealmReactPackage(),
             new ReactNativeContacts(),
             new VectorIconsPackage(),

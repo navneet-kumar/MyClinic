@@ -148,6 +148,8 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-sms')
+    compile project(':react-native-immediate-phone-call')
     compile project(':realm')
     compile project(':react-native-contacts')
     compile project(':react-native-vector-icons')

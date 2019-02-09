@@ -17,8 +17,10 @@
     "react-native-contacts": "^3.0.0",
     "react-native-datepicker": "^1.7.2",
     "react-native-gesture-handler": "^1.0.12",
+    "react-native-immediate-phone-call": "^1.0.0",
     "react-native-multiple-select": "^0.4.4",
     "react-native-sectioned-multi-select": "^0.6.4",
+    "react-native-sms": "^1.8.0",
     "react-native-vector-icons": "^6.1.0",
     "react-navigation": "^3.0.9",
     "realm": "^2.22.0"
