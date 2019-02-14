@@ -3,6 +3,7 @@ import Realm from "realm";
 export const database_name = "MyClinic.realm";
 export const patient_table_name = "patient";
 export const appointment_table_name = "appointment";
+export const settings_table_name = "settings";
 
 /*********************************/
 /**
@@ -32,6 +33,16 @@ export const PatientSchema = {
     mobile: "string",
     gender: "string?",
     age: "int?"
+  }
+};
+
+export const SettingsSchema = {
+  name: settings_table_name,
+  primaryKey: "id",
+  properties: {
+    id: "string",
+    key: "string",
+    value: "string"
   }
 };
 

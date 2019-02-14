@@ -9,11 +9,14 @@ export default class Appointment {
   reminder: number; // always in min(s)
   timestamp: Date;
   duration: number;
+  status: string;
+  earnings: number;
 
   constructor() {
     this.id = uuidv4();
     this.patient = new Patient();
     this.reminder = 30;
     this.duration = 30;
+    this.status = "PENDING";
   }
 }

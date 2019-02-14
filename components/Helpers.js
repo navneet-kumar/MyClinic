@@ -1,7 +1,9 @@
-import { Alert, PermissionsAndroid, Platform } from "react-native";
+import { Alert, Dimensions, PermissionsAndroid, Platform } from "react-native";
 import RNImmediatePhoneCall from "react-native-immediate-phone-call";
 import SendSMS from "react-native-sms";
 import { name as appName } from "../app.json";
+
+export const Screen = Dimensions.get("window");
 
 export async function GetAllPermissions() {
   try {

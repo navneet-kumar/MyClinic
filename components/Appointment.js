@@ -110,13 +110,21 @@ export default class Appointment extends React.Component {
       <Card style={{ flex: 0 }}>
         <CardItem style={style.cardRow}>
           <PatientName name={this.props.name} />
-          <Right style={{ flex: 1 }}>
-            <Icon
-              type="MaterialIcons"
-              name="cancel"
-              style={{ color: Constants.theme_color_error }}
-            />
-          </Right>
+          <TouchableOpacity
+            onPress={() =>
+              this.props.isDisabled
+                ? null
+                : this.props.onAppointmentDismiss(this.props.id)
+            }
+          >
+            <Right style={{ flex: 1 }}>
+              <Icon
+                type="MaterialIcons"
+                name="cancel"
+                style={{ color: Constants.theme_color_error }}
+              />
+            </Right>
+          </TouchableOpacity>
         </CardItem>
         <CardItem style={style.cardRow}>
           <PatientPhone mobile={this.props.mobile} name={this.props.name} />

@@ -13,8 +13,12 @@ import {
 import React from "react";
 import { FlatList } from "react-native";
 import Appointment from "../components/Appointment";
-import Constant from "../components/Constants";
-import { GetAllPermissions } from "../components/Helpers";
+import {
+  default as Constant,
+  default as Constants
+} from "../components/Constants";
+import { GetAllPermissions, ShowOkAlert } from "../components/Helpers";
+import Popup from "../components/Popup";
 import Styles from "../components/Style";
 import { getAllAppointment } from "../database/Database";
 
@@ -67,7 +71,9 @@ class ShowAppointments extends React.Component {
     super(props);
     this.state = {
       isLoading: false,
-      appointments: this.todaysAppointment()
+      appointmentId: "",
+      appointments: this.todaysAppointment(),
+      attended: []
     };
   }
 
@@ -78,11 +84,14 @@ class ShowAppointments extends React.Component {
 
   todaysAppointment() {
     getAllAppointment().then(appointments => {
-      this.setState({ isFetching: false, appointments: appointments });
+      this.setState({
+        isFetching: false,
+        appointments: appointments
+      });
     });
   }
 
-  renderItem(item) {
+  renderItem(item, isDisabled) {
     return (
       <Appointment
         id={item.id}
@@ -92,8 +101,41 @@ class ShowAppointments extends React.Component {
         gender={item.patient.gender}
         description={item.description}
         treatment={item.treatment}
+        isDisabled={isDisabled}
+        onAppointmentDismiss={this.onAppointmentClose.bind(this)}
       />
     );
+  }
+
+  onAppointmentClose(aid) {
+    this._popup.show();
+    this.setState({ appointmentId: aid });
+  }
+
+  onCancelAppointment() {
+    ShowOkAlert("Cancel - " + this.state.appointmentId);
+  }
+
+  onAttendedAppointment() {
+    let aptmnts = JSON.parse(JSON.stringify(this.state.appointments));
+    let appointment = aptmnts.filter(apt => {
+      return apt.id == this.state.appointmentId;
+    });
+    let attended = aptmnts.splice(aptmnts.indexOf(appointment));
+    this.setState({
+      attended: this.state.attended.concat(attended),
+      appointments: aptmnts
+    });
+  }
+
+  onRescheduleAppointment() {
+    ShowOkAlert("reschedule - " + this.state.appointmentId);
+  }
+
+  showHeader() {
+    if (this.state.attended.length > 0)
+      return <Text style={{ color: Constants.theme_color }}>ATTENDED</Text>;
+    else return null;
   }
 
   NoAppointmentMessage() {
@@ -119,14 +161,32 @@ class ShowAppointments extends React.Component {
 
   render() {
     return (
-      <FlatList
-        data={this.state.appointments}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) => this.renderItem(item)}
-        onRefresh={() => this.onRefresh()}
-        refreshing={this.state.isLoading}
-        ListEmptyComponent={this.NoAppointmentMessage()}
-      />
+      <React.Fragment>
+        <Popup
+          onCancelAppointment={this.onCancelAppointment.bind(this)}
+          onAttendedAppointment={this.onAttendedAppointment.bind(this)}
+          onRescheduleAppointment={this.onRescheduleAppointment.bind(this)}
+          ref={popup => {
+            this._popup = popup;
+          }}
+        />
+        <FlatList
+          data={this.state.appointments}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item }) => this.renderItem(item, false)}
+          onRefresh={() => this.onRefresh()}
+          refreshing={this.state.isLoading}
+          ListEmptyComponent={this.NoAppointmentMessage()}
+        />
+        <FlatList
+          data={this.state.attended}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item }) => this.renderItem(item, true)}
+          onRefresh={() => this.onRefresh()}
+          refreshing={this.state.isLoading}
+          ListHeaderComponent={this.showHeader()}
+        />
+      </React.Fragment>
     );
   }
 }

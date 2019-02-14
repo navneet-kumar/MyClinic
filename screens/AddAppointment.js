@@ -350,6 +350,11 @@ export default class AddAppointment extends React.Component {
                   maxLength={2}
                   style={{ color: Constants.theme_color }}
                   placeholderTextColor={Constants.theme_color}
+                  value={
+                    this.state.appointment.patient.age > 0
+                      ? String(this.state.appointment.patient.age)
+                      : ""
+                  }
                   ref={age => (this._age = age)}
                   onChangeText={inputAge => {
                     this.updateAge(inputAge);
