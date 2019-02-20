@@ -1,4 +1,5 @@
 import Realm from "realm";
+import Settings from "../modal/Settings";
 
 export const database_name = "MyClinic.realm";
 export const patient_table_name = "patient";
@@ -38,9 +39,8 @@ export const PatientSchema = {
 
 export const SettingsSchema = {
   name: settings_table_name,
-  primaryKey: "id",
+  primaryKey: "key",
   properties: {
-    id: "string",
     key: "string",
     value: "string"
   }
@@ -52,7 +52,7 @@ export const SettingsSchema = {
 /*********************************/
 const databaseOptions = {
   path: database_name,
-  schema: [AppointmentSchema, PatientSchema],
+  schema: [AppointmentSchema, PatientSchema, SettingsSchema],
   schemaVersion: 0
 };
 
@@ -196,6 +196,80 @@ export const updatePatient = patient =>
           patientToBeUpdated.gender = patient.gender;
           patientToBeUpdated.age = patient.age;
           resolve(patient);
+        });
+      })
+      .catch(error => reject(error));
+  });
+/*********************************/
+/**
+ * get all Settings
+ */
+export const getAllSettings = () =>
+  new Promise((resolve, reject) => {
+    Realm.open(databaseOptions)
+      .then(realm => {
+        realm.write(() => {
+          let settings = realm.objects(settings_table_name);
+          resolve(Array.from(settings ? settings : []));
+        });
+      })
+      .catch(error => reject(error));
+  });
+
+/**
+ * get single Settings
+ */
+export const getSingleSetting = settingKey =>
+  new Promise((resolve, reject) => {
+    Realm.open(databaseOptions)
+      .then(realm => {
+        realm.write(() => {
+          let setting = realm.objectForPrimaryKey(
+            settings_table_name,
+            settingKey
+          );
+          if (!setting) {
+            setting = new Settings(settingKey, undefined);
+          } else {
+            setting = new Settings(setting.key, JSON.parse(setting.value));
+          }
+          resolve(setting);
+        });
+      })
+      .catch(error => reject(error));
+  });
+
+/**
+ *
+ * @param {*} patient
+ */
+export const insertNewSetting = setting =>
+  new Promise((resolve, reject) => {
+    Realm.open(databaseOptions)
+      .then(realm => {
+        realm.write(() => {
+          realm.create(settings_table_name, setting);
+          resolve(setting);
+        });
+      })
+      .catch(error => reject(error));
+  });
+
+/**
+ *
+ * @param {*} setting
+ */
+export const updateSetting = setting =>
+  new Promise((resolve, reject) => {
+    Realm.open(databaseOptions)
+      .then(realm => {
+        realm.write(() => {
+          let settingsToBeUpdated = realm.objectForPrimaryKey(
+            settings_table_name,
+            setting.key
+          );
+          settingsToBeUpdated.value = setting.value;
+          resolve(setting);
         });
       })
       .catch(error => reject(error));

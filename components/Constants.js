@@ -39,7 +39,11 @@ const Constants = {
     "PAINLESS KIDS ROOT CANAL TREATMENT"
   ],
   myclinic_address:
-    "Dr. Purnata's Dental & Cosmetic Care Flat no. 6, Between Lane 5 & 6, Ganga Cascade, Meera Nagar, Koregaon Park, Pune, Maharashtra, Mobile no - +91 80-3364-7478"
+    "Dr. Purnata's Dental & Cosmetic Care Flat no. 6, Between Lane 5 & 6, Ganga Cascade, Meera Nagar, Koregaon Park, Pune, Maharashtra, Mobile no - +91 80-3364-7478",
+
+  /* Database  */
+  sms_templates: "smsTemplates",
+  sms_on_appointment: "sms_on_appointment"
 };
 
 export default Constants;

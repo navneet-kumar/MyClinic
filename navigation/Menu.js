@@ -9,17 +9,27 @@ import {
 import Calendar from "../components/Calendar";
 import Constant from "../components/Constants";
 import AddAppointment from "../screens/AddAppointment";
+import Settings from "../screens/Settings";
+import Appointment from "../screens/settings/Appointment";
+import BackupRestore from "../screens/settings/BackupRestore";
+import Sms from "../screens/settings/Sms";
 import TodaysAppointment from "../screens/TodaysAppointment";
 import Website from "../screens/Website";
 
 const AddAppointmentStackNavigator = createStackNavigator(
   {
-    addAppointment: {
-      screen: AddAppointment
-    },
-    setDateTime: {
-      screen: Calendar
-    }
+    addAppointment: { screen: AddAppointment },
+    setDateTime: { screen: Calendar }
+  },
+  {}
+);
+
+const settingsStackNavigator = createStackNavigator(
+  {
+    settings: { screen: Settings },
+    sms: { screen: Sms },
+    backupRestore: { screen: BackupRestore },
+    appointment: { screen: Appointment }
   },
   {}
 );
@@ -63,6 +73,21 @@ const MainTabNavigator = createBottomTabNavigator(
           <Icon
             type="MaterialCommunityIcons"
             name="calendar-edit"
+            size={2 * Constant.icon_size}
+            style={{ color: tintColor }}
+            color={tintColor}
+          />
+        )
+      }
+    },
+    settings: {
+      screen: settingsStackNavigator,
+      navigationOptions: {
+        tabBarLabel: "Settings",
+        tabBarIcon: ({ tintColor }) => (
+          <Icon
+            type="Octicons"
+            name="settings"
             size={2 * Constant.icon_size}
             style={{ color: tintColor }}
             color={tintColor}
