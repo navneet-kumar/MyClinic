@@ -18,12 +18,14 @@ import React, { Component } from "react";
 import { StyleSheet } from "react-native";
 import Accordion from "../../components/Accordion";
 import Constants from "../../components/Constants";
+import { ShowOkAlert } from "../../components/Helpers";
 import NewTemplate from "../../components/NewTemplate";
+import SelectPopup from "../../components/SelectPopup";
 import Styles from "../../components/Style";
-import { getSingleSetting, updateSetting } from "../../database/Database";
+import { getSingleSetting, insertNewSetting } from "../../database/Database";
 import Settings from "../../modal/Settings";
 
-export default class BackupRestore extends Component {
+export default class Sms extends Component {
   static navigationOptions = {
     header: null
   };
@@ -31,10 +33,11 @@ export default class BackupRestore extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      sendSms: false,
+      appointmentAddSms: undefined,
       smsTemplates: []
     };
     this.getTemplates();
+    this.getSendSmsSetting();
   }
 
   getTemplates() {
@@ -43,22 +46,38 @@ export default class BackupRestore extends Component {
     });
   }
 
-  getSendSmsSetting() {}
-
-  toggleSendSms(val) {
-    this.setState({
-      sendSms: val
+  getSendSmsSetting() {
+    getSingleSetting(Constants.sms_appointment).then(template => {
+      this.setState({ appointmentAddSms: template.getValue() });
     });
+  }
+
+  onTemplateChange(val) {
+    insertNewSetting(new Settings(Constants.sms_appointment, val)).then(
+      setting => {
+        this.setState({
+          appointmentAddSms: setting.getValue()
+        });
+      }
+    );
   }
 
   deleteTemplate(item) {
     let newTemplate = [];
+    if (item.title === this.state.appointmentAddSms) {
+      ShowOkAlert(
+        'Template "' +
+          item.title +
+          '" is being used and hence cannot be deleted !'
+      );
+      return;
+    }
     for (let t in this.state.smsTemplates) {
       if (this.state.smsTemplates[t].title !== item.title) {
         newTemplate.push(this.state.smsTemplates[t]);
       }
     }
-    updateSetting(new Settings(Constants.sms_templates, newTemplate)).then(
+    insertNewSetting(new Settings(Constants.sms_templates, newTemplate)).then(
       setting => {
         this.setState({ smsTemplates: JSON.parse(setting.value) });
       }
@@ -77,6 +96,14 @@ export default class BackupRestore extends Component {
             this._template = template;
           }}
           toReloadParent={this.getTemplates.bind(this)}
+        />
+        <SelectPopup
+          ref={selectPopup => {
+            this._selectPopup = selectPopup;
+          }}
+          elements={this.state.smsTemplates}
+          selected={this.state.appointmentAddSms}
+          onSelectionChange={this.onTemplateChange.bind(this)}
         />
         <Header style={styles.themeColor}>
           <Left>
@@ -97,16 +124,25 @@ export default class BackupRestore extends Component {
         <Content>
           <List>
             <ListItem>
-              <Left>
+              <Left style={{ flex: 1, flexDirection: "column" }}>
                 <Text style={styles.settingsText}>
                   Send SMS on adding appointment
+                </Text>
+                <Text style={styles.subscript}>
+                  {this.state.appointmentAddSms
+                    ? String(this.state.appointmentAddSms)
+                    : "Please set default template"}
                 </Text>
               </Left>
               <Right>
                 <Switch
-                  onValueChange={this.toggleSendSms.bind(this)}
-                  value={this.state.sendSms}
+                  value={this.state.appointmentAddSms ? true : false}
                   thumbColor={Constants.theme_color}
+                  onValueChange={status =>
+                    status
+                      ? this._selectPopup.show()
+                      : this.onTemplateChange(undefined)
+                  }
                   trackColor={{
                     false: "#d9d9d9",
                     true: "#d9d9d9"
@@ -180,6 +216,10 @@ const styles = StyleSheet.create({
   subheading: {
     fontWeight: "bold",
     fontSize: 16
+  },
+  subscript: {
+    fontSize: 12,
+    color: "grey"
   },
   templates: {
     flex: 1,

@@ -12,13 +12,10 @@ import {
 } from "native-base";
 import React from "react";
 import { FlatList } from "react-native";
+import ActionPopup from "../components/ActionPopup";
 import Appointment from "../components/Appointment";
-import {
-  default as Constant,
-  default as Constants
-} from "../components/Constants";
+import Constant from "../components/Constants";
 import { GetAllPermissions, ShowOkAlert } from "../components/Helpers";
-import Popup from "../components/Popup";
 import Styles from "../components/Style";
 import { getAllAppointment } from "../database/Database";
 
@@ -134,7 +131,7 @@ class ShowAppointments extends React.Component {
 
   showHeader() {
     if (this.state.attended.length > 0)
-      return <Text style={{ color: Constants.theme_color }}>ATTENDED</Text>;
+      return <Text style={{ color: Constant.theme_color }}>ATTENDED</Text>;
     else return null;
   }
 
@@ -162,10 +159,12 @@ class ShowAppointments extends React.Component {
   render() {
     return (
       <React.Fragment>
-        <Popup
-          onCancelAppointment={this.onCancelAppointment.bind(this)}
-          onAttendedAppointment={this.onAttendedAppointment.bind(this)}
-          onRescheduleAppointment={this.onRescheduleAppointment.bind(this)}
+        <ActionPopup
+          elements={[
+            { Attended: this.onAttendedAppointment.bind(this) },
+            { Reschedule: this.onRescheduleAppointment.bind(this) },
+            { "Cancel Appointment": this.onCancelAppointment.bind(this) }
+          ]}
           ref={popup => {
             this._popup = popup;
           }}

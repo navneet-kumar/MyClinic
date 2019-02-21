@@ -4,7 +4,23 @@ import { StyleSheet, Text, View } from "react-native";
 import Modal from "react-native-modalbox";
 import Constants from "./Constants";
 
-export default class Popup extends Component {
+const ActionButton = props => {
+  return (
+    <Button
+      block
+      rounded
+      style={styles.modalButton}
+      onPress={() => {
+        props.context.hide();
+        props.onTap();
+      }}
+    >
+      <Text style={styles.text}>{props.name}</Text>
+    </Button>
+  );
+};
+
+export default class ActionPopup extends Component {
   constructor() {
     super();
     this.state = {
@@ -26,7 +42,7 @@ export default class Popup extends Component {
     return (
       <Modal
         style={styles.verticalList}
-        position={"bottom"}
+        position={this.props.position ? this.props.position : "bottom"}
         swipeArea={20}
         isDisabled={false}
         ref={modal => {
@@ -36,39 +52,16 @@ export default class Popup extends Component {
         <Container>
           <Content>
             <View style={styles.modal}>
-              <Button
-                block
-                rounded
-                style={styles.modalButton}
-                onPress={() => {
-                  this.hide();
-                  this.props.onAttendedAppointment();
-                }}
-              >
-                <Text style={styles.text}>Attended</Text>
-              </Button>
-              <Button
-                block
-                rounded
-                style={styles.modalButton}
-                onPress={() => {
-                  this.hide();
-                  this.props.onRescheduleAppointment();
-                }}
-              >
-                <Text style={styles.text}>Reschedule</Text>
-              </Button>
-              <Button
-                block
-                rounded
-                style={styles.modalButton}
-                onPress={() => {
-                  this.hide();
-                  this.props.onCancelAppointment();
-                }}
-              >
-                <Text style={styles.text}>Cancel Appointment</Text>
-              </Button>
+              {this.props.elements.map((element, index) => {
+                return (
+                  <ActionButton
+                    key={index}
+                    name={Object.keys(element)[0]}
+                    onTap={element[Object.keys(element)[0]]}
+                    context={this}
+                  />
+                );
+              })}
             </View>
           </Content>
         </Container>

@@ -248,7 +248,7 @@ export const insertNewSetting = setting =>
     Realm.open(databaseOptions)
       .then(realm => {
         realm.write(() => {
-          realm.create(settings_table_name, setting);
+          realm.create(settings_table_name, setting, true);
           resolve(setting);
         });
       })

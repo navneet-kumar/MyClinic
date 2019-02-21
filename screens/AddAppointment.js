@@ -11,16 +11,17 @@ import {
   Item,
   Label,
   Left,
-  Picker,
   Right,
   Text,
   Textarea,
   Title
 } from "native-base";
 import React from "react";
+import { StyleSheet } from "react-native";
 import Constants from "../components/Constants";
 import { ShowOkAlert } from "../components/Helpers";
 import MyContacts from "../components/MyContacts";
+import PickerWrapper from "../components/PickerWrapper";
 import Styles from "../components/Style";
 import { insertAppointment } from "../database/Database";
 import Appointment from "../modal/Appointment.ts";
@@ -312,31 +313,12 @@ export default class AddAppointment extends React.Component {
                   name="transgender"
                   style={Styles.iconStyle}
                 />
-                <Picker
+                <PickerWrapper
                   mode="dropdown"
-                  textStyle={{ color: Constants.theme_color }}
-                  iosIcon={
-                    <Icon style={Styles.iconStyle} name="ios-arrow-down" />
-                  }
-                  selectedValue={this.state.appointment.patient.gender}
+                  data={["Gender", "male", "female"]}
                   onValueChange={this.updateGender.bind(this)}
-                >
-                  <Picker.Item
-                    color={Constants.theme_color}
-                    label="Gender"
-                    value="gender"
-                  />
-                  <Picker.Item
-                    color={Constants.theme_color}
-                    label="Male"
-                    value="male"
-                  />
-                  <Picker.Item
-                    color={Constants.theme_color}
-                    label="Female"
-                    value="female"
-                  />
-                </Picker>
+                  selected={this.state.appointment.patient.gender}
+                />
               </Item>
               <Item style={{ width: "50%", borderColor: "transparent" }}>
                 <Icon
@@ -368,26 +350,12 @@ export default class AddAppointment extends React.Component {
                 name="stethoscope"
                 style={Styles.iconStyle}
               />
-              <Picker
-                iosHeader="Treatments"
-                textStyle={{ color: Constants.theme_color }}
-                iosIcon={
-                  <Icon style={Styles.iconStyle} name="ios-arrow-down" />
-                }
-                selectedValue={this.state.appointment.treatment}
+              <PickerWrapper
+                data={Constants.treatments}
+                selected={this.state.appointment.treatment}
                 onValueChange={this.updateTreatment.bind(this)}
-              >
-                {Constants.treatments.map((treatment, index) => {
-                  return (
-                    <Picker.Item
-                      color={Constants.theme_color}
-                      key={index}
-                      label={treatment}
-                      value={treatment}
-                    />
-                  );
-                })}
-              </Picker>
+                header={"Treatments"}
+              />
             </Item>
             <Item>
               <Icon
@@ -463,7 +431,7 @@ export default class AddAppointment extends React.Component {
                 }}
               />
             </Item>
-            <Item style={{ paddingTop: 30, alignSelf: "center" }}>
+            <Item style={styles.paddedButton}>
               <Button
                 iconLeft
                 style={{ backgroundColor: Constants.theme_color }}
@@ -486,3 +454,10 @@ export default class AddAppointment extends React.Component {
     );
   }
 }
+
+const styles = StyleSheet.create({
+  paddedButton: {
+    paddingTop: 30,
+    alignSelf: "center"
+  }
+});

@@ -1,4 +1,4 @@
-import { Button, Icon, Left, Right, Text, View } from "native-base";
+import { Body, Button, Icon, Left, Right, Text, View } from "native-base";
 import React from "react";
 import {
   Animated,
@@ -153,6 +153,14 @@ export default class Accordion extends React.Component {
     this.setState({ selected: this.props.expanded });
   }
 
+  noItems() {
+    return (
+      <Body>
+        <Text style={styles.settingsText}> No templates found </Text>
+      </Body>
+    );
+  }
+
   render() {
     return (
       <FlatList
@@ -161,11 +169,12 @@ export default class Accordion extends React.Component {
         style={[
           {
             borderColor: "#d3d3d3",
-            borderWidth: 1
+            borderWidth: 0.5
           },
           this.props.style
         ]}
         keyExtractor={(item, index) => String(index)}
+        ListEmptyComponent={this.noItems()}
         renderItem={({ item, index }) => (
           <AccordionItem
             key={String(index)}

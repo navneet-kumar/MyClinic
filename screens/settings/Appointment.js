@@ -25,7 +25,7 @@ const IconWithText = props => {
   );
 };
 
-export default class BackupRestore extends Component {
+export default class Appointment extends Component {
   static navigationOptions = {
     header: null
   };
