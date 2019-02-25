@@ -12,18 +12,25 @@ import {
   Title
 } from "native-base";
 import React, { Component } from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, TouchableOpacity } from "react-native";
+import ActivityProgress from "../../components/ActivityProgress";
 import Constants from "../../components/Constants";
+import { downloadFile, ShowOkAlert } from "../../components/Helpers";
 import Styles from "../../components/Style";
+import {
+  getAllAppointment,
+  getAllPatients,
+  getAllSettings
+} from "../../database/Database";
 
 const IconWithText = props => {
   return (
-    <React.Fragment>
+    <TouchableOpacity style={styles.full} onPress={() => props.onPress()}>
       <Left>
         <Icon name={props.name} type={props.type} style={Styles.iconStyle} />
         <Text style={styles.settingsText}>{props.text}</Text>
       </Left>
-    </React.Fragment>
+    </TouchableOpacity>
   );
 };
 
@@ -32,9 +39,46 @@ export default class BackupRestore extends Component {
     header: null
   };
 
+  constructor() {
+    super();
+    this.state = {
+      showActivityIndicator: false
+    };
+  }
+
+  backup() {
+    this.setState({ showActivityIndicator: true });
+
+    getAllAppointment()
+      .then(allAppointment => {
+        downloadFile("appointment.json", JSON.stringify(allAppointment));
+      })
+      .then(() => {
+        getAllPatients().then(allPatients => {
+          downloadFile("patients.json", JSON.stringify(allPatients));
+        });
+      })
+      .then(() => {
+        getAllSettings().then(allSettings => {
+          downloadFile("settings.json", JSON.stringify(allSettings));
+        });
+      })
+      .then(() => {
+        this.setState({ showActivityIndicator: false });
+        ShowOkAlert(" Backup Completed ..!");
+      });
+  }
+
+  restore() {
+    ShowOkAlert("Restore Pressed");
+  }
+
   render() {
     return (
       <Container>
+        <ActivityProgress
+          showActivityIndicator={this.state.showActivityIndicator}
+        />
         <Header style={styles.themeColor}>
           <Left>
             <Button transparent onPress={() => this.props.navigation.goBack()}>
@@ -48,7 +92,7 @@ export default class BackupRestore extends Component {
             </Button>
           </Left>
           <Body style={styles.themeComplementColor}>
-            <Title>Backup and Resotre</Title>
+            <Title>Backup and Restore</Title>
           </Body>
         </Header>
         <Content>
@@ -58,6 +102,7 @@ export default class BackupRestore extends Component {
                 name="storage"
                 type="MaterialIcons"
                 text="Take Backup"
+                onPress={this.backup.bind(this)}
               />
             </ListItem>
             <ListItem>
@@ -65,6 +110,7 @@ export default class BackupRestore extends Component {
                 name="file-restore"
                 type="MaterialCommunityIcons"
                 text="Restore Backup"
+                onPress={this.restore.bind(this)}
               />
             </ListItem>
           </List>
@@ -87,5 +133,9 @@ const styles = StyleSheet.create({
   settingsText: {
     color: Constants.theme_color,
     paddingLeft: 12
+  },
+  full: {
+    flex: 1,
+    flexDirection: "row"
   }
 });

@@ -1,6 +1,7 @@
 import { Alert, Dimensions, PermissionsAndroid, Platform } from "react-native";
 import RNImmediatePhoneCall from "react-native-immediate-phone-call";
 import SendSMS from "react-native-sms";
+import RNFetchBlob from "rn-fetch-blob";
 import { name as appName } from "../app.json";
 
 export const Screen = Dimensions.get("window");
@@ -10,7 +11,9 @@ export async function GetAllPermissions() {
     if (Platform.OS === "android") {
       const userResponse = await PermissionsAndroid.requestMultiple([
         PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
-        PermissionsAndroid.PERMISSIONS.CALL_PHONE
+        PermissionsAndroid.PERMISSIONS.CALL_PHONE,
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE
       ]);
       return userResponse;
     }
@@ -176,4 +179,13 @@ export function sms(phoneNumber, content) {
       );
     }
   );
+}
+
+export async function downloadFile(filename, fileContent) {
+  let filePath = RNFetchBlob.fs.dirs.DownloadDir + "/" + filename;
+  RNFetchBlob.fs.writeStream(filePath, "utf8").then(stream => {
+    stream.write(fileContent);
+    stream.close();
+  });
+  return filePath;
 }

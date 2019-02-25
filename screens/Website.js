@@ -9,9 +9,10 @@ import {
   Title
 } from "native-base";
 import React from "react";
-import { ActivityIndicator, WebView } from "react-native";
+import { WebView } from "react-native";
+import ActivityProgress from "../components/ActivityProgress";
 import Constant from "../components/Constants";
-import { isAndroid, ShowOkAlert } from "../components/Helpers";
+import { ShowOkAlert } from "../components/Helpers";
 import Styles from "../components/Style";
 
 export default class Website extends React.Component {
@@ -22,7 +23,7 @@ export default class Website extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      isLoaded: false
+      showActivityIndicator: true
     };
   }
 
@@ -61,14 +62,11 @@ export default class Website extends React.Component {
               ShowOkAlert("Error occured while loading your website..! ");
             }}
             onLoadEnd={() => {
-              this.setState({ isLoaded: true });
+              this.setState({ showActivityIndicator: false });
             }}
           />
-          <ActivityIndicator
-            size={isAndroid() ? 100 : "large"}
-            color={Constant.theme_color}
-            animating={!this.state.isLoaded}
-            style={Styles.spinnerLoading}
+          <ActivityProgress
+            showActivityIndicator={this.state.showActivityIndicator}
           />
         </Content>
       </Container>

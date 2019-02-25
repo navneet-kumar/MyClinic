@@ -148,6 +148,7 @@ android {
 }
 
 dependencies {
+    compile project(':rn-fetch-blob')
     compile project(':react-native-sms')
     compile project(':react-native-immediate-phone-call')
     compile project(':realm')
