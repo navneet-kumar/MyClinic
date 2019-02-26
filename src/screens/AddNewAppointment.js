@@ -23,10 +23,10 @@ import { ShowOkAlert } from "../components/Helpers";
 import MyContacts from "../components/MyContacts";
 import PickerWrapper from "../components/PickerWrapper";
 import Styles from "../components/Style";
-import { insertAppointment } from "../database/Database";
+import { insertAppointment } from "../Database";
 import Appointment from "../modal/Appointment.ts";
 
-export default class AddAppointment extends React.Component {
+export default class AddNewAppointment extends React.Component {
   static navigationOptions = {
     header: null
   };

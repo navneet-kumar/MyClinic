@@ -6,19 +6,19 @@ import {
   createStackNavigator,
   TabBarBottom
 } from "react-navigation";
-import Calendar from "../components/Calendar";
-import Constant from "../components/Constants";
-import AddAppointment from "../screens/AddAppointment";
-import Settings from "../screens/Settings";
-import Appointment from "../screens/settings/Appointment";
-import BackupRestore from "../screens/settings/BackupRestore";
-import Sms from "../screens/settings/Sms";
-import TodaysAppointment from "../screens/TodaysAppointment";
-import Website from "../screens/Website";
+import Calendar from "./components/Calendar";
+import Constant from "./components/Constants";
+import AddNewAppointment from "./screens/AddNewAppointment";
+import Appointments from "./screens/Appointments";
+import Settings from "./screens/Settings";
+import Appointment from "./screens/settings/Appointment";
+import BackupRestore from "./screens/settings/BackupRestore";
+import Sms from "./screens/settings/Sms";
+import Website from "./screens/Website";
 
 const AddAppointmentStackNavigator = createStackNavigator(
   {
-    addAppointment: { screen: AddAppointment },
+    addAppointment: { screen: AddNewAppointment },
     setDateTime: { screen: Calendar }
   },
   {}
@@ -51,7 +51,7 @@ const MainTabNavigator = createBottomTabNavigator(
       }
     },
     appointmentFeed: {
-      screen: TodaysAppointment,
+      screen: Appointments,
       navigationOptions: {
         tabBarLabel: "Appointments",
         tabBarIcon: ({ tintColor }) => (

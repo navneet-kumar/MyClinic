@@ -21,7 +21,7 @@ import {
   getAllAppointment,
   getAllPatients,
   getAllSettings
-} from "../../database/Database";
+} from "../../Database";
 
 const IconWithText = props => {
   return (

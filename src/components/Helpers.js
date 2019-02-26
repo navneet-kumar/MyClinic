@@ -2,7 +2,7 @@ import { Alert, Dimensions, PermissionsAndroid, Platform } from "react-native";
 import RNImmediatePhoneCall from "react-native-immediate-phone-call";
 import SendSMS from "react-native-sms";
 import RNFetchBlob from "rn-fetch-blob";
-import { name as appName } from "../app.json";
+import { name as appName } from "../../App";
 
 export const Screen = Dimensions.get("window");
 

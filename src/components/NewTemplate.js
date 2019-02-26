@@ -16,11 +16,7 @@ import {
 import React, { Component } from "react";
 import { ScrollView, StyleSheet } from "react-native";
 import Modal from "react-native-modalbox";
-import {
-  getSingleSetting,
-  insertNewSetting,
-  updateSetting
-} from "../database/Database";
+import { getSingleSetting, insertNewSetting, updateSetting } from "../Database";
 import Settings from "../modal/Settings";
 import Constants from "./Constants";
 import { ShowOkAlert } from "./Helpers";

@@ -104,7 +104,7 @@ const Description = props => {
 /**
  * Appointment card
  */
-export default class Appointment extends React.Component {
+export default class AppointmentCard extends React.Component {
   render() {
     return (
       <Card style={{ flex: 0 }}>
@@ -151,7 +151,7 @@ const style = StyleSheet.create({
   }
 });
 
-Appointment.propTypesTypes = {
+AppointmentCard.propTypesTypes = {
   id: PropTypes.string,
   name: PropTypes.string,
   mobile: PropTypes.string,

@@ -22,7 +22,7 @@ import { ShowOkAlert } from "../../components/Helpers";
 import NewTemplate from "../../components/NewTemplate";
 import SelectPopup from "../../components/SelectPopup";
 import Styles from "../../components/Style";
-import { getSingleSetting, insertNewSetting } from "../../database/Database";
+import { getSingleSetting, insertNewSetting } from "../../Database";
 import Settings from "../../modal/Settings";
 
 export default class Sms extends Component {

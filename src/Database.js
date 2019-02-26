@@ -1,5 +1,5 @@
 import Realm from "realm";
-import Settings from "../modal/Settings";
+import Settings from "./modal/Settings";
 
 export const database_name = "MyClinic.realm";
 export const patient_table_name = "patient";

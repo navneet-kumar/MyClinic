@@ -4,7 +4,7 @@ import { TouchableOpacity } from "react-native";
 import Contacts from "react-native-contacts";
 import SectionedMultiSelect from "react-native-sectioned-multi-select";
 import { isAndroid, ShowOkAlert, Warning } from "../components/Helpers";
-import { getAllPatients, insertPatients } from "../database/Database";
+import { getAllPatients, insertPatients } from "../Database";
 import Patient from "../modal/Patient";
 import Constants from "./Constants";
 import Styles from "./Style";
