@@ -13,9 +13,15 @@ import {
 } from "native-base";
 import React, { Component } from "react";
 import { StyleSheet, TouchableOpacity } from "react-native";
+import { DocumentPickerUtil } from "react-native-document-picker";
 import ActivityProgress from "../../components/ActivityProgress";
 import Constants from "../../components/Constants";
-import { downloadFile, ShowOkAlert } from "../../components/Helpers";
+import {
+  downloadFile,
+  readFile,
+  resourcePicker,
+  ShowOkAlert
+} from "../../components/Helpers";
 import Styles from "../../components/Style";
 import {
   getAllAppointment,
@@ -70,7 +76,13 @@ export default class BackupRestore extends Component {
   }
 
   restore() {
-    ShowOkAlert("Restore Pressed");
+    resourcePicker(DocumentPickerUtil.allFiles()).then(res => {
+      console.log(res);
+      let content = readFile(res.uri);
+      console.log(content);
+    });
+    // let content = readFile(resource.uri);
+    // console.log(content);
   }
 
   render() {

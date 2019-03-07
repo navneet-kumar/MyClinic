@@ -2,22 +2,9 @@ import { Card, CardItem, Icon, Left, Right, Text } from "native-base";
 import PropTypes from "prop-types";
 import React from "react";
 import { StyleSheet, TouchableOpacity } from "react-native";
-import Constants from "./Constants";
+import Constants, { Status } from "./Constants";
 import { call, positiveNegativeNeutralAlert, sms } from "./Helpers";
 import Styles from "./Style";
-
-const PatientName = props => {
-  if (props.name) {
-    return (
-      <Left>
-        <Icon name="person" style={Styles.iconStyle} />
-        <Text style={{ color: Constants.theme_color }}>{props.name}</Text>
-      </Left>
-    );
-  } else {
-    return null;
-  }
-};
 
 function onContactPress(name, contactNo) {
   positiveNegativeNeutralAlert(
@@ -30,6 +17,31 @@ function onContactPress(name, contactNo) {
   );
 }
 
+getIconStyle = function(status, extra) {
+  return status == Status.CANCELLED
+    ? [Styles.iconStyle, style.themeDisabled, extra]
+    : [Styles.iconStyle, extra];
+};
+
+getTextStyle = function(status, extra) {
+  return status == Status.PENDING
+    ? [style.theme, extra]
+    : [style.themeDisabled, extra];
+};
+
+const PatientName = props => {
+  if (props.name) {
+    return (
+      <Left>
+        <Icon name="person" style={getIconStyle(props.status)} />
+        <Text style={getTextStyle(props.status)}>{props.name}</Text>
+      </Left>
+    );
+  } else {
+    return null;
+  }
+};
+
 const PatientPhone = props => {
   if (props.mobile) {
     return (
@@ -40,13 +52,16 @@ const PatientPhone = props => {
             onContactPress(props.name, props.mobile);
           }}
         >
-          <Icon name="call" style={[Styles.iconStyle, { paddingRight: 10 }]} />
+          <Icon
+            name="call"
+            style={getIconStyle(props.status, { paddingRight: 10 })}
+          />
           <Icon
             name="message-text"
             type="MaterialCommunityIcons"
-            style={Styles.iconStyle}
+            style={getIconStyle(props.status)}
           />
-          <Text style={{ color: Constants.theme_color }}>{props.mobile}</Text>
+          <Text style={getTextStyle(props.status)}>{props.mobile}</Text>
         </TouchableOpacity>
       </Left>
     );
@@ -57,7 +72,7 @@ const PatientPhone = props => {
 
 const PatientGender = props => {
   if (props.gender) {
-    return <Icon name={props.gender} style={Styles.iconStyle} />;
+    return <Icon name={props.gender} style={getIconStyle(props.status)} />;
   } else {
     return null;
   }
@@ -65,9 +80,7 @@ const PatientGender = props => {
 
 const PatientAge = props => {
   if (props.age) {
-    return (
-      <Text style={{ color: Constants.theme_color }}>{props.age} yr(s)</Text>
-    );
+    return <Text style={getTextStyle(props.status)}>{props.age} yr(s)</Text>;
   } else {
     return null;
   }
@@ -77,8 +90,12 @@ const Treatment = props => {
   if (props.treatment) {
     return (
       <CardItem style={style.cardRow}>
-        <Icon type="FontAwesome" name="stethoscope" style={Styles.iconStyle} />
-        <Text style={{ color: Constants.theme_color }}>{props.treatment}</Text>
+        <Icon
+          type="FontAwesome"
+          name="stethoscope"
+          style={getIconStyle(props.status)}
+        />
+        <Text style={getTextStyle(props.status)}>{props.treatment}</Text>
       </CardItem>
     );
   } else {
@@ -90,11 +107,31 @@ const Description = props => {
   if (props.description) {
     return (
       <CardItem style={style.cardRow}>
-        <Icon type="FontAwesome" name="user-md" style={Styles.iconStyle} />
-        <Text style={{ color: Constants.theme_color }}>
-          {props.description}
-        </Text>
+        <Icon
+          type="FontAwesome"
+          name="user-md"
+          style={getIconStyle(props.status)}
+        />
+        <Text style={getTextStyle(props.status)}>{props.description}</Text>
       </CardItem>
+    );
+  } else {
+    return null;
+  }
+};
+
+const Options = props => {
+  if (props.status == Status.PENDING) {
+    return (
+      <TouchableOpacity onPress={() => props.onOptionsPress(props.patientId)}>
+        <Right style={{ flex: 1 }}>
+          <Icon
+            type="SimpleLineIcons"
+            name="options-vertical"
+            style={style.theme}
+          />
+        </Right>
+      </TouchableOpacity>
     );
   } else {
     return null;
@@ -105,36 +142,49 @@ const Description = props => {
  * Appointment card
  */
 export default class AppointmentCard extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
   render() {
     return (
       <Card style={{ flex: 0 }}>
         <CardItem style={style.cardRow}>
-          <PatientName name={this.props.name} />
-          <TouchableOpacity
-            onPress={() =>
-              this.props.isDisabled
-                ? null
-                : this.props.onAppointmentDismiss(this.props.id)
-            }
-          >
-            <Right style={{ flex: 1 }}>
-              <Icon
-                type="MaterialIcons"
-                name="cancel"
-                style={{ color: Constants.theme_color_error }}
-              />
-            </Right>
-          </TouchableOpacity>
+          <PatientName
+            name={this.props.content.patient.name}
+            status={this.props.content.status}
+          />
+          <Options
+            patientId={this.props.content.id}
+            status={this.props.content.status}
+            onOptionsPress={this.props.onAppointmentDismiss}
+          />
         </CardItem>
         <CardItem style={style.cardRow}>
-          <PatientPhone mobile={this.props.mobile} name={this.props.name} />
+          <PatientPhone
+            mobile={this.props.content.patient.mobile}
+            name={this.props.content.patient.name}
+            status={this.props.content.status}
+          />
           <Left style={{ flex: 0 }}>
-            <PatientGender gender={this.props.gender} />
-            <PatientAge age={this.props.age} />
+            <PatientGender
+              gender={this.props.content.patient.gender}
+              status={this.props.content.status}
+            />
+            <PatientAge
+              age={this.props.content.patient.age}
+              status={this.props.content.status}
+            />
           </Left>
         </CardItem>
-        <Treatment treatment={this.props.treatment} />
-        <Description description={this.props.description} />
+        <Treatment
+          treatment={this.props.content.treatment}
+          status={this.props.content.status}
+        />
+        <Description
+          description={this.props.content.description}
+          status={this.props.content.status}
+        />
         <CardItem />
       </Card>
     );
@@ -148,6 +198,12 @@ const style = StyleSheet.create({
   button: {
     height: "10%",
     paddingLeft: 0
+  },
+  theme: {
+    color: Constants.theme_color
+  },
+  themeDisabled: {
+    color: "grey"
   }
 });
 

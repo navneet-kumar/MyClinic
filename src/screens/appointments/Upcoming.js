@@ -3,47 +3,45 @@ import React from "react";
 import { FlatList, StyleSheet } from "react-native";
 import ActionPopup from "../../components/ActionPopup";
 import AppointmentCard from "../../components/AppointmentCard";
-import Constant from "../../components/Constants";
+import Constant, { Status } from "../../components/Constants";
+import { filterById } from "../../components/Helpers";
+import InputPopup from "../../components/InputPopup";
 import Styles from "../../components/Style";
-import { getAllAppointment } from "../../Database";
+import { getFilteredAppointments, updateAppointment } from "../../Database";
 
-export default class Today extends React.Component {
-  constructor(props) {
-    super(props);
+export default class Upcoming extends React.Component {
+  constructor() {
+    super();
     this.state = {
-      isLoading: false,
-      appointmentId: "",
-      appointments: null,
-      attended: []
+      isLoading: true,
+      appointmentId: null,
+      appointments: null
     };
-    this.todaysAppointment();
   }
 
-  onRefresh() {
-    this.setState({ isFetching: true });
-    this.todaysAppointment();
+  componentDidMount() {
+    this.load();
   }
 
-  todaysAppointment() {
-    getAllAppointment().then(appointments => {
-      this.setState({
-        isFetching: false,
-        appointments: appointments
-      });
+  load() {
+    getFilteredAppointments("status=" + Status.PENDING).then(appointments => {
+      this.setState({ isLoading: false, appointments: appointments });
     });
   }
 
-  renderItem(item, isDisabled) {
+  shouldComponentUpdate(nextProps, nextState) {
+    return this.state != nextState;
+  }
+
+  onRefresh() {
+    this.setState({ isLoading: true });
+    this.load();
+  }
+
+  renderItem(item) {
     return (
       <AppointmentCard
-        id={item.id}
-        name={item.patient.name}
-        mobile={item.patient.mobile}
-        age={item.patient.age}
-        gender={item.patient.gender}
-        description={item.description}
-        treatment={item.treatment}
-        isDisabled={isDisabled}
+        content={item}
         onAppointmentDismiss={this.onAppointmentClose.bind(this)}
       />
     );
@@ -55,38 +53,43 @@ export default class Today extends React.Component {
   }
 
   onCancelAppointment() {
-    ShowOkAlert("Cancel - " + this.state.appointmentId);
+    let a = filterById(this.state.appointments, this.state.appointmentId);
+    a.status = Status.CANCELLED;
+    updateAppointment(a).then(() => {
+      this.load();
+    });
   }
 
   onAttendedAppointment() {
-    let aptmnts = JSON.parse(JSON.stringify(this.state.appointments));
-    let appointment = aptmnts.filter(apt => {
-      return apt.id == this.state.appointmentId;
-    });
-    let attended = aptmnts.splice(aptmnts.indexOf(appointment));
-    this.setState({
-      attended: this.state.attended.concat(attended),
-      appointments: aptmnts
-    });
+    this._inputPopup.show();
+    // let a = filterById(this.state.appointments, this.state.appointmentId);
+    // a.status = Status.COMPLETED;
+    // updateAppointment(a).then(() => {
+    //   this.load();
+    // });
   }
 
   onRescheduleAppointment() {
-    ShowOkAlert("reschedule - " + this.state.appointmentId);
+    let a = filterById(this.state.appointments, this.state.appointmentId);
+    a.status = Status.PENDING;
+    updateAppointment(a).then(() => {
+      this.load();
+    });
   }
 
   NoAppointmentMessage() {
     return (
       <Body style={{ paddingTop: "50%" }}>
-        <Item style={{ flexDirection: "column", borderColor: "transparent" }}>
-          <Item style={{ borderColor: "transparent" }}>
+        <Item style={styles.vertical}>
+          <Item style={styles.transparent}>
             <Icon
               type="EvilIcons"
               name="calendar"
               style={[Styles.iconStyle, { fontSize: 150 }]}
             />
           </Item>
-          <Item style={{ borderColor: "transparent" }}>
-            <Text style={{ textAlign: "center", color: Constant.theme_color }}>
+          <Item style={styles.transparent}>
+            <Text style={styles.textCenter}>
               No Appointments scheduled for today ... {"\n"} Enjoy !!
             </Text>
           </Item>
@@ -109,6 +112,11 @@ export default class Today extends React.Component {
               this._popup = popup;
             }}
           />
+          <InputPopup
+            ref={popup => {
+              this._inputPopup = popup;
+            }}
+          />
           <FlatList
             data={this.state.appointments}
             keyExtractor={(item, index) => index.toString()}
@@ -128,5 +136,16 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     borderColor: "transparent"
+  },
+  transparent: {
+    borderColor: "transparent"
+  },
+  vertical: {
+    flexDirection: "column",
+    borderColor: "transparent"
+  },
+  textCenter: {
+    textAlign: "center",
+    color: Constant.theme_color
   }
 });

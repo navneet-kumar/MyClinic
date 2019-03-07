@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.facebook.react.ReactApplication;
 import com.RNFetchBlob.RNFetchBlobPackage;
+import com.reactnativedocumentpicker.ReactNativeDocumentPicker;
 import com.tkporter.sendsms.SendSMSPackage;
 import com.github.wumke.RNImmediatePhoneCall.RNImmediatePhoneCallPackage;
 import io.realm.react.RealmReactPackage;
@@ -28,15 +29,16 @@ public class MainApplication extends Application implements ReactApplication {
 
     @Override
     protected List<ReactPackage> getPackages() {
-      return Arrays.<ReactPackage>asList(
-          new MainReactPackage(),
-            new RNFetchBlobPackage(),
-            SendSMSPackage.getInstance(),
-            new RNImmediatePhoneCallPackage(),
-            new RealmReactPackage(),
-            new ReactNativeContacts(),
-            new VectorIconsPackage(),
-            new RNGestureHandlerPackage()
+      return Arrays.<ReactPackage>asList(//
+          new MainReactPackage(), //
+          new RNFetchBlobPackage(), //
+          new ReactNativeDocumentPicker(), //
+          SendSMSPackage.getInstance(), //
+          new RNImmediatePhoneCallPackage(), //
+          new RealmReactPackage(), //
+          new ReactNativeContacts(), //
+          new VectorIconsPackage(), //
+          new RNGestureHandlerPackage()//
       );
     }
 

@@ -1,5 +1,12 @@
 import { isAndroid } from "./Helpers";
 
+export const Status = Object.freeze({
+  PENDING: 1,
+  ONGOING: 2,
+  COMPLETED: 3,
+  CANCELLED: 4
+});
+
 const Constants = {
   theme_color: "#6a51ae",
   theme_compliment_color: "#ffffff",

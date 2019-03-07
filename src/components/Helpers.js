@@ -1,4 +1,5 @@
 import { Alert, Dimensions, PermissionsAndroid, Platform } from "react-native";
+import { DocumentPicker } from "react-native-document-picker";
 import RNImmediatePhoneCall from "react-native-immediate-phone-call";
 import SendSMS from "react-native-sms";
 import RNFetchBlob from "rn-fetch-blob";
@@ -188,4 +189,39 @@ export async function downloadFile(filename, fileContent) {
     stream.close();
   });
   return filePath;
+}
+
+export function filterById(data, id) {
+  for (var index = 0; index < data.length; index++) {
+    if (data[index].id == id) {
+      return JSON.parse(JSON.stringify(data[index]));
+    }
+  }
+  return null;
+}
+
+export async function readFile(uri) {
+  const data = await RNFetchBlob.fs.readFile(uri, "base64");
+  return new Buffer(data, "base64");
+}
+// RNFetchBlob.fs.readFile(fileUri, "base64").then(data => {
+//   res["data"] = data;
+//   return res;
+// });
+export async function resourcePicker(resourceType) {
+  DocumentPicker.show(
+    {
+      filetype: [resourceType]
+    },
+    (error, res) => {
+      if (isAndroid()) {
+        res["uri"] = res.uri.split("raw%3A")[1].replace(/\%2F/gm, "/");
+        return res;
+      } else {
+        let arr = fileUri.split("/");
+        const dirs = RNFetchBlob.fs.dirs;
+        filePath = `${dirs.DocumentDir}/${arr[arr.length - 1]}`;
+      }
+    }
+  );
 }

@@ -1,3 +1,4 @@
+import { Status } from "../components/Constants";
 import { uuidv4 } from "../components/Helpers";
 import Patient from "./Patient";
 
@@ -9,7 +10,13 @@ export default class Appointment {
   reminder: number; // always in min(s)
   timestamp: Date;
   duration: number;
-  status: string;
+  /* Status can have following states
+    - PENDING (default)
+    - ONGOING
+    - COMPLETED
+    - CANCELLED
+  */
+  status: number;
   earnings: number;
 
   constructor() {
@@ -17,6 +24,6 @@ export default class Appointment {
     this.patient = new Patient();
     this.reminder = 30;
     this.duration = 30;
-    this.status = "PENDING";
+    this.status = Status.PENDING;
   }
 }

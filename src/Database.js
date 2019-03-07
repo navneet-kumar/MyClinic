@@ -21,7 +21,9 @@ export const AppointmentSchema = {
     description: "string?",
     reminder: { type: "int", default: 30 },
     timestamp: "date",
-    duration: { type: "int", default: 30 }
+    duration: { type: "int", default: 30 },
+    status: { type: "int", default: 1 },
+    earnings: "int?"
   }
 };
 
@@ -60,13 +62,30 @@ const databaseOptions = {
 /**
  * get all appointments
  */
-export const getAllAppointment = () =>
+export const getAllAppointment = async () =>
   new Promise((resolve, reject) => {
     Realm.open(databaseOptions)
       .then(realm => {
         realm.write(() => {
           let appointments = realm.objects(appointment_table_name);
-          resolve(Array.from(appointments));
+          resolve(appointments);
+        });
+      })
+      .catch(error => reject(error));
+  });
+
+/**
+ * get all appointments
+ */
+export const getFilteredAppointments = query =>
+  new Promise((resolve, reject) => {
+    Realm.open(databaseOptions)
+      .then(realm => {
+        realm.write(() => {
+          let appointments = realm
+            .objects(appointment_table_name)
+            .filtered(query);
+          resolve(appointments);
         });
       })
       .catch(error => reject(error));
@@ -107,7 +126,9 @@ export const updateAppointment = appointment =>
           appointmentToBeUpdated.reminder = appointment.reminder;
           appointmentToBeUpdated.timestamp = appointment.timestamp;
           appointmentToBeUpdated.duration = appointment.duration;
-          resolve();
+          appointmentToBeUpdated.status = appointment.status;
+          appointmentToBeUpdated.earnings = appointment.earnings;
+          resolve(appointmentToBeUpdated);
         });
       })
       .catch(error => reject(error));
