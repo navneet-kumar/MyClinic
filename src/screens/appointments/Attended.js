@@ -40,15 +40,27 @@ export default class Attended extends React.Component {
         <Item style={styles.vertical}>
           <Item style={styles.transparent}>
             <Icon
-              type="EvilIcons"
-              name="calendar"
-              style={[Styles.iconStyle, { fontSize: 150 }]}
+              type="MaterialCommunityIcons"
+              name="progress-check"
+              style={[Styles.iconStyle, { fontSize: 130 }]}
             />
           </Item>
           <Item style={styles.transparent}>
             <Text style={styles.textCenter}>
-              No Appointments scheduled for today ... {"\n"} Enjoy !!
+              Please mark appointment as "Attended"!!
             </Text>
+          </Item>
+        </Item>
+        <Item style={[styles.vertical, { paddingTop: "30%" }]}>
+          <Item style={[styles.transparent]}>
+            <Icon
+              type="MaterialCommunityIcons"
+              name="chevron-double-down"
+              style={Styles.iconStyle}
+            />
+          </Item>
+          <Item style={[styles.transparent]}>
+            <Text style={styles.textCenter}>Pull down to reload</Text>
           </Item>
         </Item>
       </Body>

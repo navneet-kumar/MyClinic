@@ -24,9 +24,15 @@ import {
 } from "../../components/Helpers";
 import Styles from "../../components/Style";
 import {
+  appointment_table_name,
   getAllAppointment,
   getAllPatients,
-  getAllSettings
+  getAllSettings,
+  insertAppointment,
+  insertNewSetting,
+  insertPatients,
+  patient_table_name,
+  settings_table_name
 } from "../../Database";
 
 const IconWithText = props => {
@@ -57,16 +63,25 @@ export default class BackupRestore extends Component {
 
     getAllAppointment()
       .then(allAppointment => {
-        downloadFile("appointment.json", JSON.stringify(allAppointment));
+        downloadFile(
+          appointment_table_name + Constants.backup_extension,
+          JSON.stringify(allAppointment)
+        );
       })
       .then(() => {
         getAllPatients().then(allPatients => {
-          downloadFile("patients.json", JSON.stringify(allPatients));
+          downloadFile(
+            patient_table_name + Constants.backup_extension,
+            JSON.stringify(allPatients)
+          );
         });
       })
       .then(() => {
         getAllSettings().then(allSettings => {
-          downloadFile("settings.json", JSON.stringify(allSettings));
+          downloadFile(
+            settings_table_name + Constants.backup_extension,
+            JSON.stringify(allSettings)
+          );
         });
       })
       .then(() => {
@@ -77,12 +92,29 @@ export default class BackupRestore extends Component {
 
   restore() {
     resourcePicker(DocumentPickerUtil.allFiles()).then(res => {
-      console.log(res);
-      let content = readFile(res.uri);
-      console.log(content);
+      let tableName = res.fileName.split(".")[0];
+      if (tableName) {
+        switch (tableName) {
+          case appointment_table_name:
+            readFile(res.fileName, false).then(plainText => {
+              insertAppointment(JSON.parse(plainText));
+            });
+            break;
+          case patient_table_name:
+            readFile(res.fileName, false).then(plainText => {
+              insertPatients(JSON.parse(plainText));
+            });
+            break;
+          case settings_table_name:
+            readFile(res.fileName, false).then(plainText => {
+              insertNewSetting(JSON.parse(plainText));
+            });
+            break;
+          default:
+            console.warn("Provided backup file is unknown : " + res.fileName);
+        }
+      }
     });
-    // let content = readFile(resource.uri);
-    // console.log(content);
   }
 
   render() {

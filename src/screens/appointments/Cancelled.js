@@ -41,14 +41,26 @@ export default class Cancelled extends React.Component {
           <Item style={styles.transparent}>
             <Icon
               type="EvilIcons"
-              name="calendar"
+              name="trash"
               style={[Styles.iconStyle, { fontSize: 150 }]}
             />
           </Item>
           <Item style={styles.transparent}>
             <Text style={styles.textCenter}>
-              No Appointments scheduled for today ... {"\n"} Enjoy !!
+              No Appointments in the Trash !!
             </Text>
+          </Item>
+        </Item>
+        <Item style={[styles.vertical, { paddingTop: "35%" }]}>
+          <Item style={[styles.transparent]}>
+            <Icon
+              type="MaterialCommunityIcons"
+              name="chevron-double-down"
+              style={Styles.iconStyle}
+            />
+          </Item>
+          <Item style={[styles.transparent]}>
+            <Text style={styles.textCenter}>Pull down to reload</Text>
           </Item>
         </Item>
       </Body>

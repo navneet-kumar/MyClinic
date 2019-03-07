@@ -200,28 +200,24 @@ export function filterById(data, id) {
   return null;
 }
 
-export async function readFile(uri) {
-  const data = await RNFetchBlob.fs.readFile(uri, "base64");
-  return new Buffer(data, "base64");
+export async function readFile(uri, base64) {
+  // return RNFetchBlob.fs.readFile(uri, "base64");
+  return RNFetchBlob.fs.readFile(uri, "base64").then(content => {
+    return base64 ? content : RNFetchBlob.base64.decode(content);
+  });
 }
-// RNFetchBlob.fs.readFile(fileUri, "base64").then(data => {
-//   res["data"] = data;
-//   return res;
-// });
+
 export async function resourcePicker(resourceType) {
-  DocumentPicker.show(
-    {
-      filetype: [resourceType]
-    },
-    (error, res) => {
+  return new Promise(resolve => {
+    DocumentPicker.show({ filetype: [resourceType] }, (error, res) => {
       if (isAndroid()) {
         res["uri"] = res.uri.split("raw%3A")[1].replace(/\%2F/gm, "/");
-        return res;
+        resolve(res);
       } else {
         let arr = fileUri.split("/");
         const dirs = RNFetchBlob.fs.dirs;
         filePath = `${dirs.DocumentDir}/${arr[arr.length - 1]}`;
       }
-    }
-  );
+    });
+  });
 }

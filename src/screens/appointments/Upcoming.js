@@ -94,6 +94,18 @@ export default class Upcoming extends React.Component {
             </Text>
           </Item>
         </Item>
+        <Item style={[styles.vertical, { paddingTop: "30%" }]}>
+          <Item style={[styles.transparent]}>
+            <Icon
+              type="MaterialCommunityIcons"
+              name="chevron-double-down"
+              style={Styles.iconStyle}
+            />
+          </Item>
+          <Item style={[styles.transparent]}>
+            <Text style={styles.textCenter}>Pull down to reload</Text>
+          </Item>
+        </Item>
       </Body>
     );
   }
@@ -123,7 +135,7 @@ export default class Upcoming extends React.Component {
             renderItem={({ item }) => this.renderItem(item, false)}
             onRefresh={() => this.onRefresh()}
             refreshing={this.state.isLoading}
-            ListEmptyComponent={this.NoAppointmentMessage()}
+            ListEmptyComponent={this.NoAppointmentMessage(this.state.isLoading)}
           />
         </Content>
       </React.Fragment>

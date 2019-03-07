@@ -48,8 +48,8 @@ const Constants = {
   myclinic_address:
     "Dr. Purnata's Dental & Cosmetic Care Flat no. 6, Between Lane 5 & 6, Ganga Cascade, Meera Nagar, Koregaon Park, Pune, Maharashtra, Mobile no - +91 80-3364-7478",
 
-  /* Database  */
-
+  /* Database backup */
+  backup_extension: ".json",
   /* General */
   treatments_list: "treatment_list",
   /* SMS */
