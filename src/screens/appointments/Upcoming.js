@@ -61,12 +61,12 @@ export default class Upcoming extends React.Component {
   }
 
   onAttendedAppointment() {
-    this._inputPopup.show();
-    // let a = filterById(this.state.appointments, this.state.appointmentId);
-    // a.status = Status.COMPLETED;
-    // updateAppointment(a).then(() => {
-    //   this.load();
-    // });
+    // this._inputPopup.show();
+    let a = filterById(this.state.appointments, this.state.appointmentId);
+    a.status = Status.COMPLETED;
+    updateAppointment(a).then(() => {
+      this.load();
+    });
   }
 
   onRescheduleAppointment() {

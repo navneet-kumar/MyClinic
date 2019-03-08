@@ -68,7 +68,7 @@ export const getAllAppointment = async () =>
       .then(realm => {
         realm.write(() => {
           let appointments = realm.objects(appointment_table_name);
-          resolve(appointments);
+          resolve(Array.from(appointments));
         });
       })
       .catch(error => reject(error));
@@ -103,6 +103,25 @@ export const insertAppointment = appointment =>
           realm.create(appointment_table_name, appointment, true);
           resolve(appointment);
         });
+      })
+      .catch(error => reject(error));
+  });
+
+/**
+ * insert multiple appointments in bulk
+ * @param {Appointment} Appointment
+ */
+export const insertAppointments = appointments =>
+  new Promise((resolve, reject) => {
+    console.log(appointments);
+    Realm.open(databaseOptions)
+      .then(realm => {
+        appointments.map(appointment => {
+          realm.write(() => {
+            realm.create(appointment_table_name, appointment, true);
+          });
+        });
+        resolve(appointments.length);
       })
       .catch(error => reject(error));
   });
@@ -170,8 +189,8 @@ export const getAllPatients = () =>
   });
 
 /**
- *
- * @param {*} patient
+ * insert single patient
+ * @param {Patient} Patient
  */
 export const insertPatient = patient =>
   new Promise((resolve, reject) => {
@@ -187,15 +206,16 @@ export const insertPatient = patient =>
 
 /**
  * insert multiple patients in bulk
- * @param {*} patients
+ * @param {Patient} patients
  */
 export const insertPatients = patients =>
   new Promise((resolve, reject) => {
+    console.log(patients);
     Realm.open(databaseOptions)
       .then(realm => {
         patients.map(patient => {
           realm.write(() => {
-            realm.create(patient_table_name, patient);
+            realm.create(patient_table_name, patient, true);
           });
         });
         resolve(patients.length);
@@ -261,8 +281,26 @@ export const getSingleSetting = settingKey =>
   });
 
 /**
+ * insert multiple settings in bulk, list of {@link Settings.ts}
+ * @param {Setting} setting
+ */
+export const insertSettings = settings =>
+  new Promise((resolve, reject) => {
+    Realm.open(databaseOptions)
+      .then(realm => {
+        settings.map(setting => {
+          realm.write(() => {
+            realm.create(settings_table_name, setting);
+          });
+        });
+        resolve(settings.length);
+      })
+      .catch(error => reject(error));
+  });
+
+/**
  *
- * @param {*} patient
+ * @param {*} Setting
  */
 export const insertNewSetting = setting =>
   new Promise((resolve, reject) => {

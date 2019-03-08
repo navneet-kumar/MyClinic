@@ -28,9 +28,9 @@ import {
   getAllAppointment,
   getAllPatients,
   getAllSettings,
-  insertAppointment,
-  insertNewSetting,
+  insertAppointments,
   insertPatients,
+  insertSettings,
   patient_table_name,
   settings_table_name
 } from "../../Database";
@@ -86,32 +86,68 @@ export default class BackupRestore extends Component {
       })
       .then(() => {
         this.setState({ showActivityIndicator: false });
-        ShowOkAlert(" Backup Completed ..!");
+        ShowOkAlert("Backup Completed ..!");
       });
   }
 
   restore() {
+    this.setState({ showActivityIndicator: true });
+
     resourcePicker(DocumentPickerUtil.allFiles()).then(res => {
       let tableName = res.fileName.split(".")[0];
       if (tableName) {
         switch (tableName) {
           case appointment_table_name:
-            readFile(res.fileName, false).then(plainText => {
-              insertAppointment(JSON.parse(plainText));
+            readFile(res.uri, false).then(plainText => {
+              insertAppointments(JSON.parse(plainText))
+                .then(count => {
+                  this.setState({ showActivityIndicator: false });
+                  ShowOkAlert(count + " appointments restored successfully !");
+                })
+                .catch(err => {
+                  this.setState({ showActivityIndicator: false });
+                  ShowOkAlert(
+                    "Something went wrong while restoring file : " + err
+                  );
+                });
             });
             break;
           case patient_table_name:
-            readFile(res.fileName, false).then(plainText => {
-              insertPatients(JSON.parse(plainText));
+            readFile(res.uri, false).then(plainText => {
+              insertPatients(JSON.parse(plainText))
+                .then(count => {
+                  this.setState({ showActivityIndicator: false });
+                  ShowOkAlert(count + " patients restored successfully !");
+                })
+                .catch(err => {
+                  this.setState({ showActivityIndicator: false });
+                  ShowOkAlert(
+                    "Something went wrong while restoring file : " + err
+                  );
+                });
             });
             break;
           case settings_table_name:
-            readFile(res.fileName, false).then(plainText => {
-              insertNewSetting(JSON.parse(plainText));
+            readFile(res.uri, false).then(plainText => {
+              insertSettings(JSON.parse(plainText))
+                .then(count => {
+                  this.setState({ showActivityIndicator: false });
+                  ShowOkAlert(count + " settings restored successfully !");
+                })
+                .catch(err => {
+                  this.setState({ showActivityIndicator: false });
+                  ShowOkAlert(
+                    "Something went wrong while restoring file : " + err
+                  );
+                });
             });
             break;
           default:
-            console.warn("Provided backup file is unknown : " + res.fileName);
+            ShowOkAlert(
+              "Unrecognized backup file " +
+                res.fileName +
+                ", make sure not to change name or content of backup file."
+            );
         }
       }
     });
