@@ -6,6 +6,9 @@ import {
   Header,
   Icon,
   Left,
+  List,
+  ListItem,
+  Right,
   Text,
   Title
 } from "native-base";
@@ -21,6 +24,9 @@ const IconWithText = props => {
         <Icon name={props.name} type={props.type} style={Styles.iconStyle} />
         <Text style={styles.settingsText}>{props.text}</Text>
       </Left>
+      <Right>
+        <Icon name="arrow-forward" style={Styles.iconStyle} />
+      </Right>
     </React.Fragment>
   );
 };
@@ -49,7 +55,21 @@ export default class Appointment extends Component {
             <Title>Appointments</Title>
           </Body>
         </Header>
-        <Content />
+        <Content>
+          <List>
+            <ListItem
+              onPress={() =>
+                this.props.navigation.navigate("treatmentsManager")
+              }
+            >
+              <IconWithText
+                name="stethoscope"
+                type="FontAwesome"
+                text="Treatments Manager"
+              />
+            </ListItem>
+          </List>
+        </Content>
       </Container>
     );
   }

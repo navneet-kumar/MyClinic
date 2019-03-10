@@ -1,9 +1,12 @@
+import moment from "moment";
 import { Alert, Dimensions, PermissionsAndroid, Platform } from "react-native";
 import { DocumentPicker } from "react-native-document-picker";
 import RNImmediatePhoneCall from "react-native-immediate-phone-call";
 import SendSMS from "react-native-sms";
 import RNFetchBlob from "rn-fetch-blob";
 import { name as appName } from "../../App";
+import { getSingleSetting } from "../Database";
+import Constants from "./Constants";
 
 export const Screen = Dimensions.get("window");
 
@@ -161,25 +164,79 @@ export function call(phoneNumber) {
   }
 }
 
+/**
+ * Read template and replace place holder with appointment data
+ * @param {*} templateKey
+ * @param {*} appointment
+ */
+export function getSmsContentFromTemplate(templateKey, appointment) {
+  return new Promise(resolve => {
+    let content = "";
+    //"$Mr","$Name","$Date","$Time","$Duration"
+    getSingleSetting(Constants.sms_templates).then(templates => {
+      templates.getValue().map(item => {
+        if (item.title === templateKey) {
+          content = item.content;
+          content = content.replace(
+            "$Mr",
+            appointment.patient.gender
+              ? appointment.patient.gender
+                ? "Mr"
+                : "Ms"
+              : "Mr/s"
+          );
+          content = content.replace(
+            "$Name",
+            appointment.patient.name ? appointment.patient.name : ""
+          );
+          content = content.replace(
+            "$Date",
+            appointment.timestamp
+              ? moment(appointment.timestamp).format("dddd, Do MMMM, YYYY")
+              : ""
+          );
+          content = content.replace(
+            "$Time",
+            appointment.timestamp
+              ? moment(appointment.timestamp).format("hh:mm a")
+              : ""
+          );
+          content = content.replace(
+            "$Duration",
+            appointment.duration ? appointment.duration + " min(s)" : ""
+          );
+          resolve(content);
+        }
+      });
+    });
+  });
+}
+
 export function sms(phoneNumber, content) {
-  SendSMS.send(
-    {
-      body: content,
-      recipients: [phoneNumber],
-      successTypes: ["sent", "queued"],
-      allowAndroidSendWithoutReadPermission: true
-    },
-    (completed, cancelled, error) => {
-      console.log(
-        "SMS Callback: completed: " +
-          completed +
-          " cancelled: " +
-          cancelled +
-          "error: " +
-          error
-      );
-    }
-  );
+  if (!phoneNumber && !content) {
+    ShowOkAlert(
+      "Unable to send sms, mobile no and sms body is mandatory field"
+    );
+  } else {
+    SendSMS.send(
+      {
+        body: content,
+        recipients: [phoneNumber],
+        successTypes: ["sent", "queued"],
+        allowAndroidSendWithoutReadPermission: true
+      },
+      (completed, cancelled, error) => {
+        console.log(
+          "SMS Callback: completed: " +
+            completed +
+            " cancelled: " +
+            cancelled +
+            "error: " +
+            error
+        );
+      }
+    );
+  }
 }
 
 export async function downloadFile(filename, fileContent) {
@@ -201,7 +258,6 @@ export function filterById(data, id) {
 }
 
 export async function readFile(uri, base64) {
-  // return RNFetchBlob.fs.readFile(uri, "base64");
   return RNFetchBlob.fs.readFile(uri, "base64").then(content => {
     return base64 ? content : RNFetchBlob.base64.decode(content);
   });

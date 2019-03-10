@@ -12,18 +12,24 @@ import {
   Label,
   Left,
   Right,
+  Root,
   Text,
   Textarea,
-  Title
+  Title,
+  Toast
 } from "native-base";
 import React from "react";
 import { StyleSheet } from "react-native";
 import Constants from "../components/Constants";
-import { ShowOkAlert } from "../components/Helpers";
+import {
+  getSmsContentFromTemplate,
+  ShowOkAlert,
+  sms
+} from "../components/Helpers";
 import MyContacts from "../components/MyContacts";
 import PickerWrapper from "../components/PickerWrapper";
 import Styles from "../components/Style";
-import { insertAppointment } from "../Database";
+import { getSingleSetting, insertAppointment } from "../Database";
 import Appointment from "../modal/Appointment.ts";
 
 export default class AddNewAppointment extends React.Component {
@@ -218,239 +224,271 @@ export default class AddNewAppointment extends React.Component {
     return true;
   }
 
+  sendSms(template, appointment) {
+    getSmsContentFromTemplate(template.getValue(), appointment).then(
+      content => {
+        sms(appointment.patient.mobile, content);
+      }
+    );
+  }
+
+  componentWillUnmount() {
+    Toast.toastInstance = null;
+  }
+
   addAppointment() {
     if (this.validateFields()) {
       insertAppointment(this.state.appointment).then(() => {
-        ShowOkAlert("Appointment added successfully ..!!");
-        this.resetAddAppointmentForm();
+        getSingleSetting(Constants.sms_appointment).then(template => {
+          if (template) {
+            Toast.show({
+              text: "Appointment added successfully ..!!",
+              type: "success",
+              buttonText: "Ok"
+            });
+            this.sendSms(
+              template,
+              JSON.parse(JSON.stringify(this.state.appointment))
+            );
+          } else {
+            ShowOkAlert("Appointment added successfully ..!!");
+          }
+          this.resetAddAppointmentForm();
+        });
       });
     }
   }
 
   render() {
     return (
-      <Container>
-        <Header style={{ backgroundColor: Constants.theme_color }}>
-          <Left>
-            <Icon
-              type="FontAwesome"
-              name="user-plus"
-              style={[
-                Styles.iconStyle,
-                { color: Constants.theme_compliment_color }
-              ]}
-            />
-          </Left>
-          <Body style={{ flex: 3 }}>
-            <Title style={{ color: Constants.theme_compliment_color }}>
-              Add Appointment
-            </Title>
-          </Body>
-          <Right>
-            <Icon
-              type="MaterialCommunityIcons"
-              name="broom"
-              style={[
-                Styles.iconStyle,
-                { color: Constants.theme_compliment_color }
-              ]}
-              onPress={() => {
-                this.resetAddAppointmentForm();
-              }}
-            />
-          </Right>
-        </Header>
-        <Content>
-          <Form>
-            <Item>
+      <Root>
+        <Container>
+          <Header style={{ backgroundColor: Constants.theme_color }}>
+            <Left>
               <Icon
-                name="person"
-                style={Styles.iconStyle}
-                ref={pni => {
-                  this._patientNameIcon = pni;
-                }}
+                type="FontAwesome"
+                name="user-plus"
+                style={[
+                  Styles.iconStyle,
+                  { color: Constants.theme_compliment_color }
+                ]}
               />
-              <Input
-                placeholder="Patient Name"
-                autoCorrect={false}
-                ref={patientName => {
-                  this._patientName = patientName;
-                }}
-                placeholderTextColor={Constants.theme_color}
-                style={{ color: Constants.theme_color }}
-                value={this.state.appointment.patient.name}
-                onChangeText={name => {
-                  this.updatePatientName(name);
-                }}
-              />
-              <MyContacts onContactSelected={this.updatePatientDetails} />
-            </Item>
-            <Item>
+            </Left>
+            <Body style={{ flex: 3 }}>
+              <Title style={{ color: Constants.theme_compliment_color }}>
+                Add Appointment
+              </Title>
+            </Body>
+            <Right>
               <Icon
-                name="call"
-                style={Styles.iconStyle}
-                ref={pph => {
-                  this._patientPhoneIcon = pph;
+                type="MaterialCommunityIcons"
+                name="broom"
+                style={[
+                  Styles.iconStyle,
+                  { color: Constants.theme_compliment_color }
+                ]}
+                onPress={() => {
+                  this.resetAddAppointmentForm();
                 }}
               />
-              <Input
-                placeholder="Mobile Number"
-                keyboardType="numeric"
-                maxLength={15}
-                style={{ color: Constants.theme_color }}
-                ref={phoneNumber => (this._phoneNumber = phoneNumber)}
-                placeholderTextColor={Constants.theme_color}
-                value={this.state.appointment.patient.mobile}
-                onChangeText={mobile => {
-                  this.updatePatientMobile(mobile);
-                }}
-              />
-            </Item>
-            <Item style={{ flex: 3 }}>
-              <Item style={{ width: "50%", borderColor: "transparent" }}>
+            </Right>
+          </Header>
+          <Content>
+            <Form>
+              <Item>
+                <Text>*</Text>
                 <Icon
-                  type="FontAwesome"
-                  name="transgender"
+                  name="person"
                   style={Styles.iconStyle}
-                />
-                <PickerWrapper
-                  mode="dropdown"
-                  data={["Gender", "male", "female"]}
-                  onValueChange={this.updateGender.bind(this)}
-                  selected={this.state.appointment.patient.gender}
-                />
-              </Item>
-              <Item style={{ width: "50%", borderColor: "transparent" }}>
-                <Icon
-                  type="FontAwesome"
-                  name="child"
-                  style={Styles.iconStyle}
+                  ref={pni => {
+                    this._patientNameIcon = pni;
+                  }}
                 />
                 <Input
-                  placeholder="Age"
-                  keyboardType="numeric"
-                  maxLength={2}
-                  style={{ color: Constants.theme_color }}
+                  placeholder="Patient Name"
+                  autoCorrect={false}
+                  ref={patientName => {
+                    this._patientName = patientName;
+                  }}
                   placeholderTextColor={Constants.theme_color}
-                  value={
-                    this.state.appointment.patient.age > 0
-                      ? String(this.state.appointment.patient.age)
-                      : ""
-                  }
-                  ref={age => (this._age = age)}
-                  onChangeText={inputAge => {
-                    this.updateAge(inputAge);
+                  style={{ color: Constants.theme_color }}
+                  value={this.state.appointment.patient.name}
+                  onChangeText={name => {
+                    this.updatePatientName(name);
+                  }}
+                />
+                <MyContacts onContactSelected={this.updatePatientDetails} />
+              </Item>
+              <Item>
+                <Text>*</Text>
+                <Icon
+                  name="call"
+                  style={Styles.iconStyle}
+                  ref={pph => {
+                    this._patientPhoneIcon = pph;
+                  }}
+                />
+
+                <Input
+                  placeholder="Mobile Number"
+                  keyboardType="numeric"
+                  maxLength={15}
+                  style={{ color: Constants.theme_color }}
+                  ref={phoneNumber => (this._phoneNumber = phoneNumber)}
+                  placeholderTextColor={Constants.theme_color}
+                  value={this.state.appointment.patient.mobile}
+                  onChangeText={mobile => {
+                    this.updatePatientMobile(mobile);
                   }}
                 />
               </Item>
-            </Item>
-            <Item>
-              <Icon
-                type="FontAwesome"
-                name="stethoscope"
-                style={Styles.iconStyle}
-              />
-              <PickerWrapper
-                data={Constants.treatments}
-                selected={this.state.appointment.treatment}
-                onValueChange={this.updateTreatment.bind(this)}
-                header={"Treatments"}
-              />
-            </Item>
-            <Item>
-              <Icon
-                type="FontAwesome"
-                name="calendar"
-                style={Styles.iconStyle}
-                ref={dti => {
-                  this._dateTimeIcon = dti;
-                }}
-              />
-              <Button
-                transparent
-                onPress={() => {
-                  this.props.navigation.navigate("setDateTime", {
-                    updateDateTime: this.updateDateTime.bind(this),
-                    appointment: this.state.appointment
-                  });
-                }}
-                style={{
-                  flex: 1
-                }}
-              >
-                <Text
-                  uppercase={false}
-                  style={{ paddingLeft: 5, color: Constants.theme_color }}
-                >
-                  {Constants.date_time}
-                </Text>
+              <Item style={{ flex: 3 }}>
+                <Item style={{ width: "50%", borderColor: "transparent" }}>
+                  <Icon
+                    type="FontAwesome"
+                    name="transgender"
+                    style={Styles.iconStyle}
+                  />
+                  <PickerWrapper
+                    mode="dropdown"
+                    data={["Gender", "male", "female"]}
+                    onValueChange={this.updateGender.bind(this)}
+                    selected={this.state.appointment.patient.gender}
+                  />
+                </Item>
+                <Item style={{ width: "50%", borderColor: "transparent" }}>
+                  <Icon
+                    type="FontAwesome"
+                    name="child"
+                    style={Styles.iconStyle}
+                  />
+                  <Input
+                    placeholder="Age"
+                    keyboardType="numeric"
+                    maxLength={2}
+                    style={{ color: Constants.theme_color }}
+                    placeholderTextColor={Constants.theme_color}
+                    value={
+                      this.state.appointment.patient.age > 0
+                        ? String(this.state.appointment.patient.age)
+                        : ""
+                    }
+                    ref={age => (this._age = age)}
+                    onChangeText={inputAge => {
+                      this.updateAge(inputAge);
+                    }}
+                  />
+                </Item>
+              </Item>
+              <Item>
                 <Icon
                   type="FontAwesome"
-                  name="caret-right"
-                  style={{ fontSize: 15, color: Constants.theme_color }}
+                  name="stethoscope"
+                  style={Styles.iconStyle}
                 />
-              </Button>
-            </Item>
-            <Item>
-              <Icon type="FontAwesome" name="bell" style={Styles.iconStyle} />
-              <Label style={{ paddingLeft: 5, color: Constants.theme_color }}>
-                Remind me before
-              </Label>
-              <Item style={{ borderColor: "transparent", width: "10%" }}>
-                <Input
-                  selectTextOnFocus
-                  defaultValue={Constants.reminder + ""}
-                  ref={reminder => (this._reminder = reminder)}
-                  keyboardType="numeric"
-                  maxLength={2}
-                  placeholderTextColor={Constants.theme_color}
-                  style={{ color: Constants.theme_color }}
+                <PickerWrapper
+                  data={Constants.treatments}
+                  selected={this.state.appointment.treatment}
+                  onValueChange={this.updateTreatment.bind(this)}
+                  header={"Treatments"}
                 />
               </Item>
-              <Label
-                onPress={this.updateTimeUnit.bind(this)}
-                style={{ color: Constants.theme_color }}
-              >
-                {Constants.time_unit[this.state.timeUnit]}
-              </Label>
-            </Item>
-            <Item last style={{ paddingTop: 20 }}>
-              <Icon
-                type="FontAwesome"
-                name="paperclip"
-                style={Styles.iconStyle}
-              />
-              <Textarea
-                rowSpan={4}
-                placeholder="Additional case information, if available."
-                placeholderTextColor={Constants.theme_color}
-                style={{ color: Constants.theme_color }}
-                ref={desc => (this._desc = desc)}
-                onChangeText={desc => {
-                  this.updateDesc(desc);
-                }}
-              />
-            </Item>
-            <Item style={styles.paddedButton}>
-              <Button
-                iconLeft
-                style={{ backgroundColor: Constants.theme_color }}
-                onPress={this.addAppointment.bind(this)}
-              >
+              <Item>
+                <Text>*</Text>
                 <Icon
                   type="FontAwesome"
-                  name="user-plus"
-                  style={[
-                    Styles.iconStyle,
-                    { color: Constants.theme_compliment_color }
-                  ]}
+                  name="calendar"
+                  style={Styles.iconStyle}
+                  ref={dti => {
+                    this._dateTimeIcon = dti;
+                  }}
                 />
-                <Text>Add Appointment</Text>
-              </Button>
-            </Item>
-          </Form>
-        </Content>
-      </Container>
+                <Button
+                  transparent
+                  onPress={() => {
+                    this.props.navigation.navigate("setDateTime", {
+                      updateDateTime: this.updateDateTime.bind(this),
+                      appointment: this.state.appointment
+                    });
+                  }}
+                  style={{
+                    flex: 1
+                  }}
+                >
+                  <Text
+                    uppercase={false}
+                    style={{ paddingLeft: 5, color: Constants.theme_color }}
+                  >
+                    {Constants.date_time}
+                  </Text>
+                  <Icon
+                    type="FontAwesome"
+                    name="caret-right"
+                    style={{ fontSize: 15, color: Constants.theme_color }}
+                  />
+                </Button>
+              </Item>
+              <Item>
+                <Icon type="FontAwesome" name="bell" style={Styles.iconStyle} />
+                <Label style={{ paddingLeft: 5, color: Constants.theme_color }}>
+                  Remind me before
+                </Label>
+                <Item style={{ borderColor: "transparent", width: "10%" }}>
+                  <Input
+                    selectTextOnFocus
+                    defaultValue={Constants.reminder + ""}
+                    ref={reminder => (this._reminder = reminder)}
+                    keyboardType="numeric"
+                    maxLength={2}
+                    placeholderTextColor={Constants.theme_color}
+                    style={{ color: Constants.theme_color }}
+                  />
+                </Item>
+                <Label
+                  onPress={this.updateTimeUnit.bind(this)}
+                  style={{ color: Constants.theme_color }}
+                >
+                  {Constants.time_unit[this.state.timeUnit]}
+                </Label>
+              </Item>
+              <Item last style={{ paddingTop: 20 }}>
+                <Icon
+                  type="FontAwesome"
+                  name="paperclip"
+                  style={Styles.iconStyle}
+                />
+                <Textarea
+                  rowSpan={4}
+                  placeholder="Additional case information, if available."
+                  placeholderTextColor={Constants.theme_color}
+                  style={{ color: Constants.theme_color }}
+                  ref={desc => (this._desc = desc)}
+                  onChangeText={desc => {
+                    this.updateDesc(desc);
+                  }}
+                />
+              </Item>
+              <Item style={styles.paddedButton}>
+                <Button
+                  iconLeft
+                  style={{ backgroundColor: Constants.theme_color }}
+                  onPress={this.addAppointment.bind(this)}
+                >
+                  <Icon
+                    type="FontAwesome"
+                    name="user-plus"
+                    style={[
+                      Styles.iconStyle,
+                      { color: Constants.theme_compliment_color }
+                    ]}
+                  />
+                  <Text>Add Appointment</Text>
+                </Button>
+              </Item>
+            </Form>
+          </Content>
+        </Container>
+      </Root>
     );
   }
 }

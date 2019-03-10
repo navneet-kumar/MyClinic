@@ -14,6 +14,7 @@ import Settings from "./screens/Settings";
 import Appointment from "./screens/settings/Appointment";
 import BackupRestore from "./screens/settings/BackupRestore";
 import Sms from "./screens/settings/Sms";
+import Treatment from "./screens/settings/Treatment";
 import Website from "./screens/Website";
 
 const AddAppointmentStackNavigator = createStackNavigator(
@@ -29,7 +30,8 @@ const settingsStackNavigator = createStackNavigator(
     settings: { screen: Settings },
     sms: { screen: Sms },
     backupRestore: { screen: BackupRestore },
-    appointment: { screen: Appointment }
+    appointment: { screen: Appointment },
+    treatmentsManager: { screen: Treatment }
   },
   {}
 );

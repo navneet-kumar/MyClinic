@@ -50,8 +50,10 @@ const Constants = {
 
   /* Database backup */
   backup_extension: ".json",
+
   /* General */
   treatments_list: "treatment_list",
+
   /* SMS */
   sms_templates: "sms_templates",
   sms_appointment: "sms_appointment_add"

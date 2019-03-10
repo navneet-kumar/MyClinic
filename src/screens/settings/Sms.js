@@ -141,7 +141,7 @@ export default class Sms extends Component {
                   onValueChange={status =>
                     status
                       ? this._selectPopup.show()
-                      : this.onTemplateChange(undefined)
+                      : this.onTemplateChange(null)
                   }
                   trackColor={{
                     false: "#d9d9d9",

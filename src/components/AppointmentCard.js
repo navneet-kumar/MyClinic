@@ -71,7 +71,7 @@ const PatientPhone = props => {
 };
 
 const PatientGender = props => {
-  if (props.gender) {
+  if (props.gender && (props.gender === "male" || props.gender === "female")) {
     return <Icon name={props.gender} style={getIconStyle(props.status)} />;
   } else {
     return null;
