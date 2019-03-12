@@ -1,24 +1,37 @@
 {
-  "main": "node_modules/expo/AppEntry.js",
-  "name": "myclinic",
+  "name": "MyClinic",
+  "version": "0.0.1",
+  "private": true,
   "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "eject": "expo eject"
+    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "test": "jest"
   },
   "dependencies": {
-    "expo": "^31.0.0",
+    "moment": "^2.23.0",
     "native-base": "^2.10.0",
     "prop-types": "^15.6.2",
-    "react": "16.5.0",
-    "react-native": "https://github.com/expo/react-native/archive/sdk-31.0.0.tar.gz",
+    "react": "16.6.3",
+    "react-native": "0.57.8",
     "react-native-calendars": "^1.21.0",
-    "react-native-contacts": "^2.2.5",
+    "react-native-contacts": "^3.0.0",
     "react-native-datepicker": "^1.7.2",
+    "react-native-document-picker": "^2.3.0",
+    "react-native-immediate-phone-call": "^1.0.0",
+    "react-native-modalbox": "^1.7.1",
+    "react-native-sectioned-multi-select": "^0.6.4",
+    "react-native-sms": "^1.8.0",
     "react-native-vector-icons": "^6.1.0",
-    "react-navigation": "^3.0.9"
+    "react-navigation": "^3.0.9",
+    "realm": "^2.22.0",
+    "rn-fetch-blob": "^0.10.15"
   },
-  "devDependencies": {},
-  "private": true
+  "devDependencies": {
+    "babel-jest": "23.6.0",
+    "jest": "23.6.0",
+    "metro-react-native-babel-preset": "0.51.1",
+    "react-test-renderer": "16.6.3"
+  },
+  "jest": {
+    "preset": "react-native"
+  }
 }
