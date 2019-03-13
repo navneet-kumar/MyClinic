@@ -32,6 +32,8 @@ import Styles from "../components/Style";
 import { getSingleSetting, insertAppointment } from "../Database";
 import Appointment from "../modal/Appointment.ts";
 
+const Mandatory = () => <Text style={styles.theme_color}>*</Text>;
+
 export default class AddNewAppointment extends React.Component {
   static navigationOptions = {
     header: null
@@ -43,12 +45,20 @@ export default class AddNewAppointment extends React.Component {
     this.state = {
       timeUnit: 0,
       isLoading: true,
-      appointment: new Appointment()
+      appointment: new Appointment(),
+      treatments: ["Treatment"]
     };
   }
 
   async componentWillMount() {
-    this.setState({ isLoading: false });
+    getSingleSetting(Constants.treatments_list).then(setting => {
+      if (setting && setting.getValue()) {
+        this.setState({
+          isLoading: false,
+          treatments: this.state.treatments.concat(setting.getValue())
+        });
+      }
+    });
   }
 
   updatePatientName(patientName) {
@@ -296,7 +306,7 @@ export default class AddNewAppointment extends React.Component {
           <Content>
             <Form>
               <Item>
-                <Text>*</Text>
+                <Mandatory />
                 <Icon
                   name="person"
                   style={Styles.iconStyle}
@@ -320,7 +330,7 @@ export default class AddNewAppointment extends React.Component {
                 <MyContacts onContactSelected={this.updatePatientDetails} />
               </Item>
               <Item>
-                <Text>*</Text>
+                <Mandatory />
                 <Icon
                   name="call"
                   style={Styles.iconStyle}
@@ -387,14 +397,14 @@ export default class AddNewAppointment extends React.Component {
                   style={Styles.iconStyle}
                 />
                 <PickerWrapper
-                  data={Constants.treatments}
+                  data={this.state.treatments}
                   selected={this.state.appointment.treatment}
                   onValueChange={this.updateTreatment.bind(this)}
                   header={"Treatments"}
                 />
               </Item>
               <Item>
-                <Text>*</Text>
+                <Mandatory />
                 <Icon
                   type="FontAwesome"
                   name="calendar"
@@ -497,5 +507,8 @@ const styles = StyleSheet.create({
   paddedButton: {
     paddingTop: 30,
     alignSelf: "center"
+  },
+  theme_color: {
+    color: Constants.theme_color
   }
 });

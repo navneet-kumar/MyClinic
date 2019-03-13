@@ -6,6 +6,7 @@ import {
   Fab,
   Header,
   Icon,
+  Input,
   Item,
   Left,
   ListItem,
@@ -13,23 +14,16 @@ import {
   Title
 } from "native-base";
 import React, { Component } from "react";
-import { FlatList, StyleSheet, TouchableOpacity } from "react-native";
-import ActivityProgress from "../../components/ActivityProgress";
+import { FlatList, StyleSheet } from "react-native";
 import Constants from "../../components/Constants";
-import { ShowOkAlert } from "../../components/Helpers";
+import { positiveNegativeAlert, ShowOkAlert } from "../../components/Helpers";
 import Styles from "../../components/Style";
-import { getSingleSetting } from "../../Database";
-
-const IconWithText = props => {
-  return (
-    <TouchableOpacity style={styles.full}>
-      <Left>
-        <Icon name={props.name} type={props.type} style={Styles.iconStyle} />
-        <Text style={styles.settingsText}>{props.text}</Text>
-      </Left>
-    </TouchableOpacity>
-  );
-};
+import {
+  getSingleSetting,
+  insertNewSetting,
+  updateSetting
+} from "../../Database";
+import Settings from "../../modal/Settings";
 
 export default class Treatment extends Component {
   static navigationOptions = {
@@ -40,31 +34,156 @@ export default class Treatment extends Component {
     super();
     this.state = {
       showActivityIndicator: false,
-      treatments: ["Disease 1", "Disease 2", "Disease 3", "Disease 4"],
-      fab: true
+      treatments: [],
+      fab: true,
+      newTreatment: ""
     };
-    // this.getTreatments();
+    this.getTreatments();
   }
 
   getTreatments() {
-    getSingleSetting(Constants.treatments_list).then(treatments => {
-      if (treatments.getValue()) {
-        this.setState({ treatments: [] });
-      } else {
-        this.setState({ treatments: treatments.getValue() });
-      }
-    });
+    getSingleSetting(Constants.treatments_list)
+      .then(treatments => {
+        if (!treatments.getValue()) {
+          this.setState({ treatments: [] });
+        } else {
+          this.setState({ treatments: treatments.getValue() });
+        }
+        this.setState({ showActivityIndicator: false });
+      })
+      .catch(() => {
+        this.setState({ showActivityIndicator: false });
+      });
   }
 
   onRefresh() {
     this.setState({ showActivityIndicator: true });
+    this.getTreatments();
+  }
+
+  addNewTreatment() {
+    if (this.state.treatments == null) {
+      this.setState({ treatments: [null] });
+    } else {
+      if (this.state.treatments.indexOf(null) !== -1) {
+        ShowOkAlert("Only 1 treatment can be added at a time.");
+      } else {
+        this.setState({ treatments: this.state.treatments.concat(null) });
+      }
+    }
+  }
+
+  saveTreatment() {
+    if (this.state.newTreatment) {
+      let treatments = [].concat(this.state.treatments);
+      treatments.splice(
+        treatments.lastIndexOf(null),
+        1,
+        this.state.newTreatment
+      );
+      insertNewSetting(
+        new Settings(Constants.treatments_list, treatments)
+      ).then(() => {
+        this.setState({ treatments: treatments, newTreatment: "" });
+      });
+    } else {
+      ShowOkAlert("Treatment name can not be empty");
+    }
+  }
+
+  cancelAddingTreatment() {
+    let treatments = [].concat(this.state.treatments);
+
+    if (!this.state.newTreatment) {
+      treatments.splice(treatments.lastIndexOf(null), 1);
+      this.setState({ treatments: treatments });
+    } else {
+      positiveNegativeAlert(
+        "Are you sure you want to discard changes ?",
+        "Yes",
+        "No",
+        () => {
+          treatments.splice(treatments.lastIndexOf(null), 1);
+          this.setState({ treatments: treatments });
+        },
+        null
+      );
+    }
+  }
+
+  deleteTreatment(treatment) {
+    positiveNegativeAlert(
+      "Are you sure you want to delete \n '" + treatment + "' ?",
+      "Delete",
+      "cancel",
+      () => {
+        let treatments = [].concat(this.state.treatments);
+        treatments.splice(treatments.indexOf(treatment), 1);
+        updateSetting(new Settings(Constants.treatments_list, treatments)).then(
+          () => this.getTreatments()
+        );
+      },
+      null
+    );
   }
 
   renderItem(item) {
     return (
-      <ListItem onLongPress={() => ShowOkAlert("Long pressed")}>
+      <ListItem style={{ paddingBottom: 0 }}>
         <Icon type="FontAwesome" name="stethoscope" style={Styles.iconStyle} />
-        <Text style={styles.settingsText}>{item}</Text>
+        {item == null ? (
+          <React.Fragment>
+            <Input
+              ref={name => {
+                this._treatment = name;
+              }}
+              style={styles.settingsText}
+              autoFocus={true}
+              onChangeText={text => {
+                this.setState({ newTreatment: text });
+              }}
+            />
+            <Button transparent iconRight onPress={() => this.saveTreatment()}>
+              <Icon
+                type="MaterialIcons"
+                name="check"
+                style={[Styles.iconStyle]}
+              />
+            </Button>
+            <Button
+              transparent
+              iconRight
+              onPress={() => this.cancelAddingTreatment()}
+            >
+              <Icon
+                type="MaterialIcons"
+                name="close"
+                style={[
+                  Styles.iconStyle,
+                  { color: Constants.theme_color_error }
+                ]}
+              />
+            </Button>
+          </React.Fragment>
+        ) : (
+          <React.Fragment>
+            <Text style={styles.settingsText}>{item}</Text>
+            <Button
+              transparent
+              iconRight
+              onPress={() => this.deleteTreatment(item)}
+            >
+              <Icon
+                type="EvilIcons"
+                name="trash"
+                style={[
+                  Styles.iconStyle,
+                  { color: Constants.theme_color_error }
+                ]}
+              />
+            </Button>
+          </React.Fragment>
+        )}
       </ListItem>
     );
   }
@@ -100,20 +219,9 @@ export default class Treatment extends Component {
     );
   }
 
-  addNewTreatment() {
-    let treatments = this.state.treatments
-      ? this.state.treatments.concat("")
-      : [].concat("");
-    ShowOkAlert(JSON.stringify(treatments));
-    this.setState({ treatments: treatments });
-  }
-
   render() {
     return (
       <Container>
-        <ActivityProgress
-          showActivityIndicator={this.state.showActivityIndicator}
-        />
         <Header style={styles.themeColor}>
           <Left>
             <Button transparent onPress={() => this.props.navigation.goBack()}>
@@ -143,10 +251,12 @@ export default class Treatment extends Component {
         <Fab
           active={this.state.fab}
           direction="up"
-          style={{ backgroundColor: Constants.theme_color }}
+          style={{
+            backgroundColor: Constants.theme_color,
+            opacity: this.state.fab ? 1 : 0
+          }}
           position="bottomRight"
           onPress={() => {
-            this.setState({ fab: !this.state.fab });
             this.addNewTreatment();
           }}
         >
@@ -169,7 +279,8 @@ const styles = StyleSheet.create({
   },
   settingsText: {
     color: Constants.theme_color,
-    paddingLeft: 12
+    paddingLeft: 12,
+    width: "95%"
   },
   transparent: {
     borderColor: "transparent"
