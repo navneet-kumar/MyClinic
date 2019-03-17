@@ -38,9 +38,13 @@
 		</dict>
 	</dict>
 	<key>NSContactsUsageDescription</key>
-	<string/>
+	<string></string>
 	<key>NSRemindersUsageDescription</key>
-	<string/>
+	<string></string>
+	<key>NSAppleMusicUsageDescription</key>
+	<string></string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string></string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>AntDesign.ttf</string>

@@ -1,20 +1,17 @@
 import {
-  Body,
-  Button,
   Container,
   Content,
-  Header,
   Icon,
   Left,
   List,
   ListItem,
-  Text,
-  Title
+  Text
 } from "native-base";
 import React, { Component } from "react";
 import { StyleSheet, TouchableOpacity } from "react-native";
 import { DocumentPickerUtil } from "react-native-document-picker";
 import ActivityProgress from "../../components/ActivityProgress";
+import CommonHeader from "../../components/CommonHeader";
 import Constants from "../../components/Constants";
 import {
   downloadFile,
@@ -159,22 +156,11 @@ export default class BackupRestore extends Component {
         <ActivityProgress
           showActivityIndicator={this.state.showActivityIndicator}
         />
-        <Header style={styles.themeColor}>
-          <Left>
-            <Button transparent onPress={() => this.props.navigation.goBack()}>
-              <Icon
-                name="arrow-back"
-                style={[
-                  Styles.iconStyle,
-                  { color: Constants.theme_compliment_color }
-                ]}
-              />
-            </Button>
-          </Left>
-          <Body style={styles.themeComplementColor}>
-            <Title>Backup and Restore</Title>
-          </Body>
-        </Header>
+        <CommonHeader
+          title="Backup and Restore"
+          iconName="arrow-back"
+          goBack={this.props.navigation.goBack}
+        />
         <Content>
           <List>
             <ListItem>

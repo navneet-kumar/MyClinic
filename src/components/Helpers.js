@@ -180,7 +180,7 @@ export function getSmsContentFromTemplate(templateKey, appointment) {
           content = content.replace(
             "$Mr",
             appointment.patient.gender
-              ? appointment.patient.gender
+              ? appointment.patient.gender === "male"
                 ? "Mr"
                 : "Ms"
               : "Mr/s"
