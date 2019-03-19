@@ -1,18 +1,16 @@
 import {
-  Body,
   Container,
   Content,
-  Header,
   Icon,
   Left,
   List,
   ListItem,
   Right,
-  Text,
-  Title
+  Text
 } from "native-base";
 import React, { Component } from "react";
 import { StyleSheet } from "react-native";
+import CommonHeader from "../components/CommonHeader";
 import Constant from "../components/Constants";
 import Styles from "../components/Style";
 
@@ -38,21 +36,11 @@ export default class Settings extends Component {
   render() {
     return (
       <Container>
-        <Header style={styles.themeColor}>
-          <Left>
-            <Icon
-              type="SimpleLineIcons"
-              name="settings"
-              style={[
-                Styles.iconStyle,
-                { color: Constant.theme_compliment_color }
-              ]}
-            />
-          </Left>
-          <Body style={styles.themeComplementColor}>
-            <Title>Settings</Title>
-          </Body>
-        </Header>
+        <CommonHeader
+          title="Settings"
+          iconType="SimpleLineIcons"
+          iconName="settings"
+        />
         <Content>
           <List>
             <ListItem onPress={() => this.props.navigation.navigate("sms")}>

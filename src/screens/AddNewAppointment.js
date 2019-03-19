@@ -235,10 +235,8 @@ export default class AddNewAppointment extends React.Component {
   }
 
   sendSms(template, appointment) {
-    getSmsContentFromTemplate(template.getValue(), appointment).then(
-      content => {
-        sms(appointment.patient.mobile, content);
-      }
+    getSmsContentFromTemplate(template.getValue(), appointment).then(content =>
+      sms(appointment.patient.mobile, content)
     );
   }
 
@@ -250,11 +248,10 @@ export default class AddNewAppointment extends React.Component {
     if (this.validateFields()) {
       insertAppointment(this.state.appointment).then(() => {
         getSingleSetting(Constants.sms_appointment).then(template => {
-          if (template) {
+          if (template.getValue()) {
             Toast.show({
               text: "Appointment added successfully ..!!",
-              type: "success",
-              buttonText: "Ok"
+              type: "success"
             });
             this.sendSms(
               template,

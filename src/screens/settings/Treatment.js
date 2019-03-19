@@ -4,17 +4,15 @@ import {
   Container,
   Content,
   Fab,
-  Header,
   Icon,
   Input,
   Item,
-  Left,
   ListItem,
-  Text,
-  Title
+  Text
 } from "native-base";
 import React, { Component } from "react";
 import { FlatList, StyleSheet } from "react-native";
+import CommonHeader from "../../components/CommonHeader";
 import Constants from "../../components/Constants";
 import { positiveNegativeAlert, ShowOkAlert } from "../../components/Helpers";
 import Styles from "../../components/Style";
@@ -222,22 +220,11 @@ export default class Treatment extends Component {
   render() {
     return (
       <Container>
-        <Header style={styles.themeColor}>
-          <Left>
-            <Button transparent onPress={() => this.props.navigation.goBack()}>
-              <Icon
-                name="arrow-back"
-                style={[
-                  Styles.iconStyle,
-                  { color: Constants.theme_compliment_color }
-                ]}
-              />
-            </Button>
-          </Left>
-          <Body style={styles.themeComplementColor}>
-            <Title>Treatments</Title>
-          </Body>
-        </Header>
+        <CommonHeader
+          title="Treatments"
+          iconName="arrow-back"
+          goBack={this.props.navigation.goBack}
+        />
         <Content>
           <FlatList
             data={this.state.treatments}
