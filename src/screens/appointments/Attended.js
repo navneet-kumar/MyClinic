@@ -2,7 +2,7 @@ import { Body, Content, Icon, Item, Text } from "native-base";
 import React from "react";
 import { FlatList, StyleSheet } from "react-native";
 import AppointmentCard from "../../components/AppointmentCard";
-import Constant, { Status } from "../../components/Constants";
+import Constants, { Status } from "../../components/Constants";
 import Styles from "../../components/Style";
 import { getFilteredAppointments } from "../../Database";
 
@@ -100,6 +100,6 @@ const styles = StyleSheet.create({
   },
   textCenter: {
     textAlign: "center",
-    color: Constant.theme_color
+    color: Constants.theme_color
   }
 });

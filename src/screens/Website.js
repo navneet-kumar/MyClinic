@@ -11,7 +11,7 @@ import {
 import React from "react";
 import { WebView } from "react-native";
 import ActivityProgress from "../components/ActivityProgress";
-import Constant from "../components/Constants";
+import Constants from "../components/Constants";
 import { ShowOkAlert } from "../components/Helpers";
 import Styles from "../components/Style";
 
@@ -30,19 +30,19 @@ export default class Website extends React.Component {
   render() {
     return (
       <Container>
-        <Header style={{ backgroundColor: Constant.theme_color }}>
+        <Header style={{ backgroundColor: Constants.theme_color }}>
           <Left>
             <Icon
               type="Octicons"
               name="browser"
               style={[
                 Styles.iconStyle,
-                { color: Constant.theme_compliment_color }
+                { color: Constants.theme_compliment_color }
               ]}
             />
           </Left>
           <Body style={{ flex: 2 }}>
-            <Title style={{ color: Constant.theme_compliment_color }}>
+            <Title style={{ color: Constants.theme_compliment_color }}>
               Website
             </Title>
           </Body>
@@ -54,7 +54,7 @@ export default class Website extends React.Component {
           }}
         >
           <WebView
-            source={{ uri: Constant.website_url }}
+            source={{ uri: Constants.website_url }}
             onError={() => {
               ShowOkAlert("Error occured while loading your website..!");
             }}

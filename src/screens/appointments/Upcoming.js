@@ -3,7 +3,7 @@ import React from "react";
 import { FlatList, StyleSheet } from "react-native";
 import ActionPopup from "../../components/ActionPopup";
 import AppointmentCard from "../../components/AppointmentCard";
-import Constant, { Status } from "../../components/Constants";
+import Constants, { Status } from "../../components/Constants";
 import { filterById } from "../../components/Helpers";
 import InputPopup from "../../components/InputPopup";
 import Styles from "../../components/Style";
@@ -158,6 +158,6 @@ const styles = StyleSheet.create({
   },
   textCenter: {
     textAlign: "center",
-    color: Constant.theme_color
+    color: Constants.theme_color
   }
 });

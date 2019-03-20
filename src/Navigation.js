@@ -7,7 +7,7 @@ import {
   TabBarBottom
 } from "react-navigation";
 import Calendar from "./components/Calendar";
-import Constant from "./components/Constants";
+import Constants from "./components/Constants";
 import AddNewAppointment from "./screens/AddNewAppointment";
 import Appointments from "./screens/Appointments";
 import Settings from "./screens/Settings";
@@ -45,7 +45,7 @@ const MainTabNavigator = createBottomTabNavigator(
         tabBarIcon: ({ tintColor }) => (
           <Icon
             name={"globe"}
-            size={2 * Constant.icon_size}
+            size={2 * Constants.icon_size}
             style={{ color: tintColor }}
             color={tintColor}
           />
@@ -60,7 +60,7 @@ const MainTabNavigator = createBottomTabNavigator(
           <Icon
             type="Octicons"
             name="calendar"
-            size={2 * Constant.icon_size}
+            size={2 * Constants.icon_size}
             style={{ color: tintColor }}
             color={tintColor}
           />
@@ -75,7 +75,7 @@ const MainTabNavigator = createBottomTabNavigator(
           <Icon
             type="MaterialCommunityIcons"
             name="calendar-edit"
-            size={2 * Constant.icon_size}
+            size={2 * Constants.icon_size}
             style={{ color: tintColor }}
             color={tintColor}
           />
@@ -90,7 +90,7 @@ const MainTabNavigator = createBottomTabNavigator(
           <Icon
             type="Octicons"
             name="settings"
-            size={2 * Constant.icon_size}
+            size={2 * Constants.icon_size}
             style={{ color: tintColor }}
             color={tintColor}
           />
@@ -104,7 +104,7 @@ const MainTabNavigator = createBottomTabNavigator(
     tabBarPosition: "bottom",
     shifting: true,
     tabBarOptions: {
-      activeTintColor: Constant.theme_color,
+      activeTintColor: Constants.theme_color,
       inactiveTintColor: "gray"
     }
   }

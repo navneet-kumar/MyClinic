@@ -11,7 +11,7 @@ import {
 import React, { Component } from "react";
 import { StyleSheet } from "react-native";
 import CommonHeader from "../components/CommonHeader";
-import Constant from "../components/Constants";
+import Constants from "../components/Constants";
 import Styles from "../components/Style";
 
 const IconWithText = props => {
@@ -77,16 +77,16 @@ export default class Settings extends Component {
 
 const styles = StyleSheet.create({
   themeColor: {
-    color: Constant.theme_color,
-    backgroundColor: Constant.theme_color
+    color: Constants.theme_color,
+    backgroundColor: Constants.theme_color
   },
   themeComplementColor: {
     flex: 4,
-    color: Constant.theme_complement_color,
-    backgroundColor: Constant.theme_complement_color
+    color: Constants.theme_complement_color,
+    backgroundColor: Constants.theme_complement_color
   },
   settingsText: {
-    color: Constant.theme_color,
+    color: Constants.theme_color,
     paddingLeft: 12
   }
 });
