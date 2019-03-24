@@ -55,36 +55,36 @@ export default class BackupRestore extends Component {
     };
   }
 
-  backup() {
+  async backup() {
     this.setState({ showActivityIndicator: true });
 
-    getAllAppointment()
-      .then(allAppointment => {
-        downloadFile(
-          appointment_table_name + Constants.backup_extension,
-          JSON.stringify(allAppointment)
+    try {
+      const allAppointments = await getAllAppointment();
+      const allPatients = await getAllPatients();
+      const allSettings = await getAllSettings();
+
+      const data = [
+        { table: appointment_table_name, content: allAppointments },
+        { table: patient_table_name, content: allPatients },
+        { table: settings_table_name, content: allSettings }
+      ];
+
+      let promises = [];
+      data.map(async item => {
+        const p = downloadFile(
+          item.table + Constants.backup_extension,
+          JSON.stringify(item.content)
         );
-      })
-      .then(() => {
-        getAllPatients().then(allPatients => {
-          downloadFile(
-            patient_table_name + Constants.backup_extension,
-            JSON.stringify(allPatients)
-          );
-        });
-      })
-      .then(() => {
-        getAllSettings().then(allSettings => {
-          downloadFile(
-            settings_table_name + Constants.backup_extension,
-            JSON.stringify(allSettings)
-          );
-        });
-      })
-      .then(() => {
-        this.setState({ showActivityIndicator: false });
-        ShowOkAlert("Backup Completed ..!");
+        promises.push(p);
       });
+      const folder = await Promise.all(promises);
+
+      ShowOkAlert("Backup successful, files stored at : \n" + folder[0]);
+      this.setState({ showActivityIndicator: false });
+    } catch (err) {
+      this.setState({ showActivityIndicator: false });
+      ShowOkAlert("Error occurred while taking backup :" + err);
+    }
   }
 
   restore() {
