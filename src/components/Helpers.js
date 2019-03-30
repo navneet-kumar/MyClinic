@@ -266,6 +266,56 @@ export async function readFile(uri, base64) {
   });
 }
 
+/**
+ * category : "image"
+ * @param {*} src
+ * @param {*} category
+ */
+export async function copyFile(src, folder, category) {
+  return new Promise(resolve => {
+    if (!category) return;
+    try {
+      let dest = RNFetchBlob.fs.dirs.DocumentDir;
+      switch (category) {
+        case "image":
+          dest += "/images/" + folder;
+          break;
+      }
+      RNFetchBlob.fs.exists(dest).then(async isPresent => {
+        if (!isPresent) {
+          RNFetchBlob.fs.mkdir(dest);
+        }
+        dest += src.substr(src.lastIndexOf("/"));
+        await RNFetchBlob.fs.cp(src, dest);
+        resolve(dest);
+      });
+    } catch (err) {
+      resolve(null);
+    }
+  });
+}
+
+/**
+ * encoding - "utf8" | "ascii" | "base64"
+ * @param {*} data
+ * @param {*} encoding
+ */
+export async function writeFile(data, encoding) {
+  let dir = RNFetchBlob.fs.dirs.DocumentDir + "/images/";
+  if (!(await RNFetchBlob.fs.isDir(dir))) {
+    RNFetchBlob.fs.mkdir(dir);
+  }
+  let uri = dir + uuidv4();
+  return RNFetchBlob.fs
+    .writeFile(uri, data, encoding)
+    .then(response => {
+      return response;
+    })
+    .catch(error => {
+      ShowOkAlert("Error while saving file : \n " + error);
+    });
+}
+
 export async function resourcePicker(resourceType) {
   return new Promise(resolve => {
     DocumentPicker.show({ filetype: [resourceType] }, (error, res) => {

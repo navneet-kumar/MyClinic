@@ -48,7 +48,7 @@ export default class Upcoming extends React.Component {
   }
 
   onAppointmentClose(aid) {
-    this._popup.show();
+    this._actionPopup.show();
     this.setState({ appointmentId: aid });
   }
 
@@ -121,7 +121,7 @@ export default class Upcoming extends React.Component {
               { "Cancel Appointment": this.onCancelAppointment.bind(this) }
             ]}
             ref={popup => {
-              this._popup = popup;
+              this._actionPopup = popup;
             }}
           />
           <InputPopup

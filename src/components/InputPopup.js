@@ -1,10 +1,38 @@
-import { Button, Container, Content, Icon, Input, Item } from "native-base";
+import {
+  Button,
+  Container,
+  Content,
+  Icon,
+  Input,
+  Item,
+  Left,
+  Right
+} from "native-base";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { DocumentPickerUtil } from "react-native-document-picker";
 import Modal from "react-native-modalbox";
+import { getAppointmentById, updateAppointment } from "../Database";
+import ActivityProgress from "./ActivityProgress";
 import Constants from "./Constants";
+import { copyFile, resourcePicker, ShowOkAlert } from "./Helpers";
 import Styles from "./Style";
+
+const Attachment = props => {
+  return (
+    <Button transparent icon style={{ padding: 0 }}>
+      <Text>{props.fileName}</Text>
+      <Icon
+        name="circle-with-cross"
+        type="Entypo"
+        style={{
+          color: Constants.theme_color_error
+        }}
+        onPress={() => props.onPress(props.index)}
+      />
+    </Button>
+  );
+};
 
 const ActionButton = props => {
   return (
@@ -21,12 +49,16 @@ const ActionButton = props => {
 };
 
 export default class InputPopup extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
       isDisabled: false,
-      swipeToClose: true,
-      sliderValue: 0.3
+      swipeToClose: false,
+      sliderValue: 0.3,
+      attachments: [],
+      showActivityIndicator: false,
+      appointmentId: null,
+      earnings: null
     };
   }
 
@@ -36,6 +68,75 @@ export default class InputPopup extends React.Component {
 
   hide() {
     this._modal.close();
+  }
+
+  componentWillReceiveProps(props) {
+    if (props) this.setState({ appointmentId: props.appointmentId });
+  }
+
+  selectResource() {
+    resourcePicker(DocumentPickerUtil.images()).then(result => {
+      if (result && result.uri) {
+        if (this.state.attachments.includes(result.uri)) {
+          let fileUri = result.uri;
+          ShowOkAlert(
+            fileUri.substring(fileUri.lastIndexOf("/") + 1) +
+              " - already selected."
+          );
+        } else {
+          this.setState({
+            attachments: this.state.attachments.concat(result.uri)
+          });
+        }
+      }
+    });
+  }
+
+  removeResource(index) {
+    let selectedFiles = [].concat(this.state.attachments);
+    if (index < selectedFiles.length) {
+      selectedFiles.splice(index, 1);
+      this.setState({ attachments: selectedFiles });
+    }
+  }
+
+  async uploadResource() {
+    return new Promise(async resolve => {
+      let selectedFiles = this.state.attachments;
+      let promises = [];
+      try {
+        if (selectedFiles.length > 0) {
+          selectedFiles.map(file => {
+            promises.push(copyFile(file, this.state.appointmentId, "image"));
+          });
+          let uploadedResources = await Promise.all(promises);
+          resolve(uploadedResources);
+        }
+      } catch (err) {
+        ShowOkAlert("Error occurred while uploading ");
+      }
+    });
+  }
+
+  refresh() {
+    this.setState({
+      attachments: [],
+      showActivityIndicator: false,
+      appointmentId: null
+    });
+    this.hide();
+  }
+
+  async onDone() {
+    this.setState({ showActivityIndicator: true });
+    let uploadedResources = await this.uploadResource();
+    let appointment = await getAppointmentById(this.state.appointmentId);
+    appointment.images = uploadedResources;
+    appointment.earnings = this.state.earnings;
+    if (await updateAppointment(appointment)) {
+      ShowOkAlert("Appointment updated successfully !!");
+    }
+    this.refresh();
   }
 
   render() {
@@ -52,8 +153,17 @@ export default class InputPopup extends React.Component {
         <Container>
           <Content>
             <View style={styles.modal}>
-              <Item style={{ borderColor: "transparent" }}>
-                <Item style={{ width: "50%" }}>
+              <ActivityProgress
+                showActivityIndicator={this.state.showActivityIndicator}
+              />
+              <Item
+                style={{
+                  borderColor: "transparent",
+                  flex: 1,
+                  flexDirection: "column"
+                }}
+              >
+                <Item>
                   <Icon
                     name="rupee"
                     type="FontAwesome"
@@ -65,45 +175,54 @@ export default class InputPopup extends React.Component {
                     maxLength={6}
                     style={{ color: Constants.theme_color }}
                     placeholderTextColor={Constants.theme_color}
+                    onChangeText={text => {
+                      this.setState({ earnings: parseInt(text) });
+                    }}
                   />
                 </Item>
+                <Item>
+                  <Left>
+                    <Button
+                      onPress={this.selectResource.bind(this)}
+                      style={{
+                        backgroundColor: Constants.theme_color
+                      }}
+                    >
+                      <Icon
+                        name="attachment"
+                        type="Entypo"
+                        style={[
+                          Styles.iconStyle,
+                          { color: Constants.theme_compliment_color }
+                        ]}
+                      />
+                    </Button>
+                  </Left>
+                  <Right>
+                    {this.state.attachments.map((fileUri, index) => {
+                      return (
+                        <Attachment
+                          key={index}
+                          context={this}
+                          onPress={this.removeResource.bind(this)}
+                          fileName={fileUri.substring(
+                            fileUri.lastIndexOf("/") + 1
+                          )}
+                          index={index}
+                        />
+                      );
+                    })}
+                  </Right>
+                </Item>
+                <Item />
                 <Item
                   style={{
-                    width: "50%",
-                    borderColor: "transparent",
-                    padding: "5%"
+                    paddingTop: "12%",
+                    borderColor: "transparent"
                   }}
                 >
-                  <Button
-                    style={{ backgroundColor: Constants.theme_color }}
-                    iconRight
-                    onPress={() => resourcePicker(DocumentPickerUtil.images())}
-                  >
-                    <Text style={styles.text}>Upload image</Text>
-                    <Icon
-                      name="camera"
-                      type="FontAwesome"
-                      style={[
-                        Styles.iconStyle,
-                        { color: Constants.theme_compliment_color }
-                      ]}
-                    />
-                  </Button>
+                  <ActionButton name="Done" onTap={this.onDone.bind(this)} />
                 </Item>
-              </Item>
-              <Item
-                style={{
-                  justifyContent: "center",
-                  alignItems: "center",
-                  borderColor: "transparent"
-                }}
-              >
-                <ActionButton
-                  name="Done"
-                  onTap={() => {
-                    this.hide();
-                  }}
-                />
               </Item>
             </View>
           </Content>
@@ -115,14 +234,14 @@ export default class InputPopup extends React.Component {
 
 const styles = StyleSheet.create({
   modal: {
-    padding: "8%",
+    padding: "4%",
     backgroundColor: Constants.theme_compliment_color
   },
 
   modalButton: {
     justifyContent: "center",
     alignItems: "center",
-    width: "60%",
+    width: "40%",
     backgroundColor: Constants.theme_color
   },
   text: {

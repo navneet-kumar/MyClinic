@@ -18,6 +18,7 @@ export default class Appointment {
   */
   status: number;
   earnings: number;
+  images: Array<any>;
 
   constructor() {
     this.id = uuidv4();
