@@ -12,6 +12,7 @@ import {
 } from "native-base";
 import React, { Component } from "react";
 import { FlatList, StyleSheet } from "react-native";
+import RNRestart from "react-native-restart";
 import CommonHeader from "../../components/CommonHeader";
 import Constants from "../../components/Constants";
 import { positiveNegativeAlert, ShowOkAlert } from "../../components/Helpers";
@@ -83,6 +84,13 @@ export default class Treatment extends Component {
         new Settings(Constants.treatments_list, treatments)
       ).then(() => {
         this.setState({ treatments: treatments, newTreatment: "" });
+        positiveNegativeAlert(
+          "In order to update newly added settings please reload your application.",
+          "Reload Now",
+          "Later",
+          () => RNRestart.Restart(),
+          () => {}
+        );
       });
     } else {
       ShowOkAlert("Treatment name can not be empty");

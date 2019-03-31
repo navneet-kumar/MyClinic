@@ -148,6 +148,7 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-restart')
     compile project(':rn-fetch-blob')
     compile project(':react-native-document-picker')
     compile project(':react-native-sms')

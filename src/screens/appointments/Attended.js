@@ -3,6 +3,7 @@ import React from "react";
 import { FlatList, StyleSheet } from "react-native";
 import AppointmentCard from "../../components/AppointmentCard";
 import Constants, { Status } from "../../components/Constants";
+import InputPopup from "../../components/InputPopup";
 import Styles from "../../components/Style";
 import { getFilteredAppointments } from "../../Database";
 
@@ -31,7 +32,17 @@ export default class Attended extends React.Component {
   }
 
   renderItem(item) {
-    return <AppointmentCard content={item} />;
+    return (
+      <AppointmentCard
+        content={item}
+        onUploadPress={this.onUploadPress.bind(this)}
+      />
+    );
+  }
+
+  onUploadPress(aid) {
+    this._inputPopup.show();
+    this.setState({ appointmentId: aid });
   }
 
   NoAppointmentMessage() {
@@ -70,6 +81,11 @@ export default class Attended extends React.Component {
   render() {
     return (
       <React.Fragment>
+        <InputPopup
+          ref={popup => {
+            this._inputPopup = popup;
+          }}
+        />
         <Content padder contentContainerStyle={styles.container}>
           <FlatList
             data={this.state.attended}

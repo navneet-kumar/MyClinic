@@ -60,6 +60,9 @@ export default class AddNewAppointment extends React.Component {
       }
     });
   }
+  componentWillUnmount() {
+    Toast.toastInstance = null;
+  }
 
   updatePatientName(patientName) {
     // let patient = Object.assign({}, this.state.appointment.patient, {name: patientName});
@@ -238,10 +241,6 @@ export default class AddNewAppointment extends React.Component {
     getSmsContentFromTemplate(template.getValue(), appointment).then(content =>
       sms(appointment.patient.mobile, content)
     );
-  }
-
-  componentWillUnmount() {
-    Toast.toastInstance = null;
   }
 
   addAppointment() {

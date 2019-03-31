@@ -128,15 +128,18 @@ export default class InputPopup extends React.Component {
   }
 
   async onDone() {
-    this.setState({ showActivityIndicator: true });
-    let uploadedResources = await this.uploadResource();
-    let appointment = await getAppointmentById(this.state.appointmentId);
-    appointment.images = uploadedResources;
-    appointment.earnings = this.state.earnings;
-    if (await updateAppointment(appointment)) {
-      ShowOkAlert("Appointment updated successfully !!");
+    if (this.state.earnings && this.state.attachments.length > 0) {
+      this.setState({ showActivityIndicator: true });
+      let uploadedResources = await this.uploadResource();
+      let appointment = await getAppointmentById(this.state.appointmentId);
+      appointment.images = uploadedResources;
+      appointment.earnings = this.state.earnings;
+      if (await updateAppointment(appointment)) {
+        ShowOkAlert("Appointment updated successfully !!");
+      }
+      this.refresh();
     }
-    this.refresh();
+    this.hide();
   }
 
   render() {
