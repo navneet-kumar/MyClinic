@@ -26,5 +26,6 @@ export default class Appointment {
     this.reminder = 30;
     this.duration = 30;
     this.status = Status.PENDING;
+    this.images = [];
   }
 }

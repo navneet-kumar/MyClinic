@@ -23,7 +23,8 @@ export const AppointmentSchema = {
     timestamp: "date",
     duration: { type: "int", default: 30 },
     status: { type: "int", default: 1 },
-    earnings: "int?"
+    earnings: "int?",
+    images: { type: "string[]", default: [] }
   }
 };
 

@@ -321,7 +321,9 @@ export async function resourcePicker(resourceType) {
     DocumentPicker.show({ filetype: [resourceType] }, (error, res) => {
       try {
         if (isAndroid()) {
-          res["uri"] = res.uri.split("raw%3A")[1].replace(/\%2F/gm, "/");
+          if (res.uri.includes("raw%3A")) {
+            res["uri"] = res.uri.split("raw%3A")[1].replace(/\%2F/gm, "/");
+          }
           resolve(res);
         } else {
           let arr = fileUri.split("/");

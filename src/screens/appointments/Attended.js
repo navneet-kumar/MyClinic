@@ -12,7 +12,8 @@ export default class Attended extends React.Component {
     super();
     this.state = {
       isLoading: true,
-      attended: null
+      attended: null,
+      appointmentId: null
     };
   }
 
@@ -82,6 +83,7 @@ export default class Attended extends React.Component {
     return (
       <React.Fragment>
         <InputPopup
+          appointmentId={this.state.appointmentId}
           ref={popup => {
             this._inputPopup = popup;
           }}

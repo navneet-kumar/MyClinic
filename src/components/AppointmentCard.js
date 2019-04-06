@@ -141,7 +141,9 @@ const Options = props => {
 const Details = props => {
   if (props.status != Status.CANCELLED) {
     return (
-      <TouchableOpacity onPress={() => props.onUploadPress(props.patientId)}>
+      <TouchableOpacity
+        onPress={() => props.onUploadPress(props.appointmentId)}
+      >
         <Right>
           <Icon type="FontAwesome" name="upload" style={style.theme} />
         </Right>
@@ -204,6 +206,7 @@ export default class AppointmentCard extends React.Component {
         />
         <CardItem style={style.upload}>
           <Details
+            appointmentId={this.props.content.id}
             status={this.props.content.status}
             onUploadPress={this.props.onUploadPress}
           />

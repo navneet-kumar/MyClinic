@@ -71,7 +71,9 @@ export default class InputPopup extends React.Component {
   }
 
   componentWillReceiveProps(props) {
-    if (props) this.setState({ appointmentId: props.appointmentId });
+    if (props && props.appointmentId) {
+      this.setState({ appointmentId: props.appointmentId });
+    }
   }
 
   selectResource() {
@@ -88,6 +90,8 @@ export default class InputPopup extends React.Component {
             attachments: this.state.attachments.concat(result.uri)
           });
         }
+      } else {
+        ShowOkAlert("Error, not a valid uri: " + JSON.stringify(result));
       }
     });
   }
@@ -128,7 +132,7 @@ export default class InputPopup extends React.Component {
   }
 
   async onDone() {
-    if (this.state.earnings && this.state.attachments.length > 0) {
+    if (this.state.earnings || this.state.attachments.length > 0) {
       this.setState({ showActivityIndicator: true });
       let uploadedResources = await this.uploadResource();
       let appointment = await getAppointmentById(this.state.appointmentId);

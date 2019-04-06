@@ -49,13 +49,13 @@ export default class Upcoming extends React.Component {
   }
 
   onUploadPress(aid) {
-    this._inputPopup.show();
     this.setState({ appointmentId: aid });
+    this._inputPopup.show();
   }
 
   onAppointmentClose(aid) {
-    this._actionPopup.show();
     this.setState({ appointmentId: aid });
+    this._actionPopup.show();
   }
 
   onCancelAppointment() {
@@ -130,6 +130,7 @@ export default class Upcoming extends React.Component {
             }}
           />
           <InputPopup
+            appointmentId={this.state.appointmentId}
             ref={popup => {
               this._inputPopup = popup;
             }}
