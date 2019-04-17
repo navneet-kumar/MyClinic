@@ -10,7 +10,8 @@ please select your device.
 
 ## Glimpse of App
 
-![Add Appointments](https://raw.githubusercontent.com/navneet-kumar/MyClinic/mvp/screenshots/AddAppointments.png)
+<>
+[![My Clinic](https://img.youtube.com/vi/2VtZ5DuUWBw/0.jpg)](https://youtu.be/2VtZ5DuUWBw)
 
 ## Contributing
 

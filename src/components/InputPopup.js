@@ -80,18 +80,14 @@ export default class InputPopup extends React.Component {
     resourcePicker(DocumentPickerUtil.images()).then(result => {
       if (result && result.uri) {
         if (this.state.attachments.includes(result.uri)) {
-          let fileUri = result.uri;
-          ShowOkAlert(
-            fileUri.substring(fileUri.lastIndexOf("/") + 1) +
-              " - already selected."
-          );
+          ShowOkAlert(result.fileName + " - already selected.");
         } else {
           this.setState({
-            attachments: this.state.attachments.concat(result.uri)
+            attachments: this.state.attachments.concat(result)
           });
         }
       } else {
-        ShowOkAlert("Error, not a valid uri: " + JSON.stringify(result));
+        ShowOkAlert("Error, not a valid file: " + JSON.stringify(result));
       }
     });
   }
@@ -115,6 +111,8 @@ export default class InputPopup extends React.Component {
           });
           let uploadedResources = await Promise.all(promises);
           resolve(uploadedResources);
+        } else {
+          resolve([]);
         }
       } catch (err) {
         ShowOkAlert("Error occurred while uploading ");
@@ -206,15 +204,13 @@ export default class InputPopup extends React.Component {
                     </Button>
                   </Left>
                   <Right>
-                    {this.state.attachments.map((fileUri, index) => {
+                    {this.state.attachments.map((res, index) => {
                       return (
                         <Attachment
                           key={index}
                           context={this}
                           onPress={this.removeResource.bind(this)}
-                          fileName={fileUri.substring(
-                            fileUri.lastIndexOf("/") + 1
-                          )}
+                          fileName={res.fileName}
                           index={index}
                         />
                       );

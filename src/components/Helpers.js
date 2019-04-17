@@ -239,11 +239,15 @@ export function sms(phoneNumber, content) {
   }
 }
 
-export async function downloadFile(filename, fileContent) {
+export async function createDirectory() {
   let dir = RNFetchBlob.fs.dirs.DownloadDir + "/" + moment().format("DDMMYYYY");
   if (!(await RNFetchBlob.fs.isDir(dir))) {
     RNFetchBlob.fs.mkdir(dir);
   }
+  return dir;
+}
+
+export async function downloadFile(dir, filename, fileContent) {
   RNFetchBlob.fs.writeStream(dir + "/" + filename, "utf8").then(stream => {
     stream.write(fileContent);
     stream.close();
@@ -285,8 +289,9 @@ export async function copyFile(src, folder, category) {
         if (!isPresent) {
           RNFetchBlob.fs.mkdir(dest);
         }
-        dest += src.substr(src.lastIndexOf("/"));
-        await RNFetchBlob.fs.cp(src, dest);
+        dest += "/" + src.fileName;
+        ShowOkAlert(dest);
+        await RNFetchBlob.fs.cp(src.uri, dest);
         resolve(dest);
       });
     } catch (err) {
@@ -329,9 +334,10 @@ export async function resourcePicker(resourceType) {
           let arr = fileUri.split("/");
           const dirs = RNFetchBlob.fs.dirs;
           filePath = `${dirs.DocumentDir}/${arr[arr.length - 1]}`;
+          resolve(res);
         }
       } catch (error) {
-        console.log(error);
+        resolve(null);
       }
     });
   });

@@ -14,6 +14,7 @@ import ActivityProgress from "../../components/ActivityProgress";
 import CommonHeader from "../../components/CommonHeader";
 import Constants from "../../components/Constants";
 import {
+  createDirectory,
   downloadFile,
   readFile,
   resourcePicker,
@@ -69,9 +70,11 @@ export default class BackupRestore extends Component {
         { table: settings_table_name, content: allSettings }
       ];
 
+      let dir = await createDirectory();
       let promises = [];
       data.map(async item => {
         const p = downloadFile(
+          dir,
           item.table + Constants.backup_extension,
           JSON.stringify(item.content)
         );
@@ -89,9 +92,10 @@ export default class BackupRestore extends Component {
 
   restore() {
     this.setState({ showActivityIndicator: true });
-
     resourcePicker(DocumentPickerUtil.allFiles()).then(res => {
-      let tableName = res.fileName.split(".")[0];
+      let tableName = res
+        ? res.fileName.split(".")[0]
+        : this.setState({ showActivityIndicator: false });
       if (tableName) {
         switch (tableName) {
           case appointment_table_name:
