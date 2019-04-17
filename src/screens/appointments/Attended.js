@@ -2,7 +2,8 @@ import { Body, Content, Icon, Item, Text } from "native-base";
 import React from "react";
 import { FlatList, StyleSheet } from "react-native";
 import AppointmentCard from "../../components/AppointmentCard";
-import Constant, { Status } from "../../components/Constants";
+import Constants, { Status } from "../../components/Constants";
+import InputPopup from "../../components/InputPopup";
 import Styles from "../../components/Style";
 import { getFilteredAppointments } from "../../Database";
 
@@ -11,7 +12,8 @@ export default class Attended extends React.Component {
     super();
     this.state = {
       isLoading: true,
-      attended: null
+      attended: null,
+      appointmentId: null
     };
   }
 
@@ -31,7 +33,17 @@ export default class Attended extends React.Component {
   }
 
   renderItem(item) {
-    return <AppointmentCard content={item} />;
+    return (
+      <AppointmentCard
+        content={item}
+        onUploadPress={this.onUploadPress.bind(this)}
+      />
+    );
+  }
+
+  onUploadPress(aid) {
+    this._inputPopup.show();
+    this.setState({ appointmentId: aid });
   }
 
   NoAppointmentMessage() {
@@ -70,6 +82,12 @@ export default class Attended extends React.Component {
   render() {
     return (
       <React.Fragment>
+        <InputPopup
+          appointmentId={this.state.appointmentId}
+          ref={popup => {
+            this._inputPopup = popup;
+          }}
+        />
         <Content padder contentContainerStyle={styles.container}>
           <FlatList
             data={this.state.attended}
@@ -100,6 +118,6 @@ const styles = StyleSheet.create({
   },
   textCenter: {
     textAlign: "center",
-    color: Constant.theme_color
+    color: Constants.theme_color
   }
 });

@@ -138,12 +138,31 @@ const Options = props => {
   }
 };
 
+const Details = props => {
+  if (props.status != Status.CANCELLED) {
+    return (
+      <TouchableOpacity
+        onPress={() => props.onUploadPress(props.appointmentId)}
+      >
+        <Right>
+          <Icon type="FontAwesome" name="upload" style={style.theme} />
+        </Right>
+      </TouchableOpacity>
+    );
+  } else {
+    return null;
+  }
+};
+
 /**
  * Appointment card
  */
 export default class AppointmentCard extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      appointment: this.props.content
+    };
   }
 
   render() {
@@ -185,7 +204,13 @@ export default class AppointmentCard extends React.Component {
           description={this.props.content.description}
           status={this.props.content.status}
         />
-        <CardItem />
+        <CardItem style={style.upload}>
+          <Details
+            appointmentId={this.props.content.id}
+            status={this.props.content.status}
+            onUploadPress={this.props.onUploadPress}
+          />
+        </CardItem>
       </Card>
     );
   }
@@ -204,6 +229,11 @@ const style = StyleSheet.create({
   },
   themeDisabled: {
     color: "grey"
+  },
+  upload: {
+    flex: 0,
+    flexDirection: "row-reverse",
+    paddingTop: 0
   }
 });
 

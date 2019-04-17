@@ -1,19 +1,16 @@
 import {
-  Body,
-  Button,
   Container,
   Content,
-  Header,
   Icon,
   Left,
   List,
   ListItem,
   Right,
-  Text,
-  Title
+  Text
 } from "native-base";
 import React, { Component } from "react";
 import { StyleSheet } from "react-native";
+import CommonHeader from "../../components/CommonHeader";
 import Constants from "../../components/Constants";
 import Styles from "../../components/Style";
 
@@ -39,22 +36,11 @@ export default class Appointment extends Component {
   render() {
     return (
       <Container>
-        <Header style={styles.themeColor}>
-          <Left>
-            <Button transparent onPress={() => this.props.navigation.goBack()}>
-              <Icon
-                name="arrow-back"
-                style={[
-                  Styles.iconStyle,
-                  { color: Constants.theme_compliment_color }
-                ]}
-              />
-            </Button>
-          </Left>
-          <Body style={styles.themeComplementColor}>
-            <Title>Appointments</Title>
-          </Body>
-        </Header>
+        <CommonHeader
+          title="Appointments"
+          iconName="arrow-back"
+          goBack={this.props.navigation.goBack}
+        />
         <Content>
           <List>
             <ListItem

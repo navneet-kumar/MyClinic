@@ -180,7 +180,7 @@ export function getSmsContentFromTemplate(templateKey, appointment) {
           content = content.replace(
             "$Mr",
             appointment.patient.gender
-              ? appointment.patient.gender
+              ? appointment.patient.gender === "male"
                 ? "Mr"
                 : "Ms"
               : "Mr/s"
@@ -239,13 +239,20 @@ export function sms(phoneNumber, content) {
   }
 }
 
-export async function downloadFile(filename, fileContent) {
-  let filePath = RNFetchBlob.fs.dirs.DownloadDir + "/" + filename;
-  RNFetchBlob.fs.writeStream(filePath, "utf8").then(stream => {
+export async function createDirectory() {
+  let dir = RNFetchBlob.fs.dirs.DownloadDir + "/" + moment().format("DDMMYYYY");
+  if (!(await RNFetchBlob.fs.isDir(dir))) {
+    RNFetchBlob.fs.mkdir(dir);
+  }
+  return dir;
+}
+
+export async function downloadFile(dir, filename, fileContent) {
+  RNFetchBlob.fs.writeStream(dir + "/" + filename, "utf8").then(stream => {
     stream.write(fileContent);
     stream.close();
   });
-  return filePath;
+  return dir;
 }
 
 export function filterById(data, id) {
@@ -263,16 +270,74 @@ export async function readFile(uri, base64) {
   });
 }
 
+/**
+ * category : "image"
+ * @param {*} src
+ * @param {*} category
+ */
+export async function copyFile(src, folder, category) {
+  return new Promise(resolve => {
+    if (!category) return;
+    try {
+      let dest = RNFetchBlob.fs.dirs.DocumentDir;
+      switch (category) {
+        case "image":
+          dest += "/images/" + folder;
+          break;
+      }
+      RNFetchBlob.fs.exists(dest).then(async isPresent => {
+        if (!isPresent) {
+          RNFetchBlob.fs.mkdir(dest);
+        }
+        dest += "/" + src.fileName;
+        ShowOkAlert(dest);
+        await RNFetchBlob.fs.cp(src.uri, dest);
+        resolve(dest);
+      });
+    } catch (err) {
+      resolve(null);
+    }
+  });
+}
+
+/**
+ * encoding - "utf8" | "ascii" | "base64"
+ * @param {*} data
+ * @param {*} encoding
+ */
+export async function writeFile(data, encoding) {
+  let dir = RNFetchBlob.fs.dirs.DocumentDir + "/images/";
+  if (!(await RNFetchBlob.fs.isDir(dir))) {
+    RNFetchBlob.fs.mkdir(dir);
+  }
+  let uri = dir + uuidv4();
+  return RNFetchBlob.fs
+    .writeFile(uri, data, encoding)
+    .then(response => {
+      return response;
+    })
+    .catch(error => {
+      ShowOkAlert("Error while saving file : \n " + error);
+    });
+}
+
 export async function resourcePicker(resourceType) {
   return new Promise(resolve => {
     DocumentPicker.show({ filetype: [resourceType] }, (error, res) => {
-      if (isAndroid()) {
-        res["uri"] = res.uri.split("raw%3A")[1].replace(/\%2F/gm, "/");
-        resolve(res);
-      } else {
-        let arr = fileUri.split("/");
-        const dirs = RNFetchBlob.fs.dirs;
-        filePath = `${dirs.DocumentDir}/${arr[arr.length - 1]}`;
+      try {
+        if (isAndroid()) {
+          if (res.uri.includes("raw%3A")) {
+            res["uri"] = res.uri.split("raw%3A")[1].replace(/\%2F/gm, "/");
+          }
+          resolve(res);
+        } else {
+          let arr = fileUri.split("/");
+          const dirs = RNFetchBlob.fs.dirs;
+          filePath = `${dirs.DocumentDir}/${arr[arr.length - 1]}`;
+          resolve(res);
+        }
+      } catch (error) {
+        resolve(null);
       }
     });
   });

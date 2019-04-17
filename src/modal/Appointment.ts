@@ -18,6 +18,7 @@ export default class Appointment {
   */
   status: number;
   earnings: number;
+  images: Array<any>;
 
   constructor() {
     this.id = uuidv4();
@@ -25,5 +26,6 @@ export default class Appointment {
     this.reminder = 30;
     this.duration = 30;
     this.status = Status.PENDING;
+    this.images = [];
   }
 }

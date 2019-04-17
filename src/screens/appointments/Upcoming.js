@@ -3,7 +3,7 @@ import React from "react";
 import { FlatList, StyleSheet } from "react-native";
 import ActionPopup from "../../components/ActionPopup";
 import AppointmentCard from "../../components/AppointmentCard";
-import Constant, { Status } from "../../components/Constants";
+import Constants, { Status } from "../../components/Constants";
 import { filterById } from "../../components/Helpers";
 import InputPopup from "../../components/InputPopup";
 import Styles from "../../components/Style";
@@ -43,13 +43,19 @@ export default class Upcoming extends React.Component {
       <AppointmentCard
         content={item}
         onAppointmentDismiss={this.onAppointmentClose.bind(this)}
+        onUploadPress={this.onUploadPress.bind(this)}
       />
     );
   }
 
-  onAppointmentClose(aid) {
-    this._popup.show();
+  onUploadPress(aid) {
     this.setState({ appointmentId: aid });
+    this._inputPopup.show();
+  }
+
+  onAppointmentClose(aid) {
+    this.setState({ appointmentId: aid });
+    this._actionPopup.show();
   }
 
   onCancelAppointment() {
@@ -61,7 +67,6 @@ export default class Upcoming extends React.Component {
   }
 
   onAttendedAppointment() {
-    this._inputPopup.show();
     let a = filterById(this.state.appointments, this.state.appointmentId);
     a.status = Status.COMPLETED;
     updateAppointment(a).then(() => {
@@ -121,10 +126,11 @@ export default class Upcoming extends React.Component {
               { "Cancel Appointment": this.onCancelAppointment.bind(this) }
             ]}
             ref={popup => {
-              this._popup = popup;
+              this._actionPopup = popup;
             }}
           />
           <InputPopup
+            appointmentId={this.state.appointmentId}
             ref={popup => {
               this._inputPopup = popup;
             }}
@@ -158,6 +164,6 @@ const styles = StyleSheet.create({
   },
   textCenter: {
     textAlign: "center",
-    color: Constant.theme_color
+    color: Constants.theme_color
   }
 });

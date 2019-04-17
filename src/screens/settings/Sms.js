@@ -1,9 +1,7 @@
 import {
-  Body,
   Button,
   Container,
   Content,
-  Header,
   Icon,
   Item,
   Left,
@@ -11,12 +9,12 @@ import {
   ListItem,
   Right,
   Switch,
-  Text,
-  Title
+  Text
 } from "native-base";
 import React, { Component } from "react";
 import { StyleSheet } from "react-native";
 import Accordion from "../../components/Accordion";
+import CommonHeader from "../../components/CommonHeader";
 import Constants from "../../components/Constants";
 import { ShowOkAlert } from "../../components/Helpers";
 import NewTemplate from "../../components/NewTemplate";
@@ -105,22 +103,11 @@ export default class Sms extends Component {
           selected={this.state.appointmentAddSms}
           onSelectionChange={this.onTemplateChange.bind(this)}
         />
-        <Header style={styles.themeColor}>
-          <Left>
-            <Button transparent onPress={() => this.props.navigation.goBack()}>
-              <Icon
-                name="arrow-back"
-                style={[
-                  Styles.iconStyle,
-                  { color: Constants.theme_compliment_color }
-                ]}
-              />
-            </Button>
-          </Left>
-          <Body style={styles.themeComplementColor}>
-            <Title>SMS</Title>
-          </Body>
-        </Header>
+        <CommonHeader
+          title="SMS"
+          iconName="arrow-back"
+          goBack={this.props.navigation.goBack}
+        />
         <Content>
           <List>
             <ListItem>

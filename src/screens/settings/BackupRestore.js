@@ -1,22 +1,20 @@
 import {
-  Body,
-  Button,
   Container,
   Content,
-  Header,
   Icon,
   Left,
   List,
   ListItem,
-  Text,
-  Title
+  Text
 } from "native-base";
 import React, { Component } from "react";
 import { StyleSheet, TouchableOpacity } from "react-native";
 import { DocumentPickerUtil } from "react-native-document-picker";
 import ActivityProgress from "../../components/ActivityProgress";
+import CommonHeader from "../../components/CommonHeader";
 import Constants from "../../components/Constants";
 import {
+  createDirectory,
   downloadFile,
   readFile,
   resourcePicker,
@@ -58,43 +56,46 @@ export default class BackupRestore extends Component {
     };
   }
 
-  backup() {
+  async backup() {
     this.setState({ showActivityIndicator: true });
 
-    getAllAppointment()
-      .then(allAppointment => {
-        downloadFile(
-          appointment_table_name + Constants.backup_extension,
-          JSON.stringify(allAppointment)
+    try {
+      const allAppointments = await getAllAppointment();
+      const allPatients = await getAllPatients();
+      const allSettings = await getAllSettings();
+
+      const data = [
+        { table: appointment_table_name, content: allAppointments },
+        { table: patient_table_name, content: allPatients },
+        { table: settings_table_name, content: allSettings }
+      ];
+
+      let dir = await createDirectory();
+      let promises = [];
+      data.map(async item => {
+        const p = downloadFile(
+          dir,
+          item.table + Constants.backup_extension,
+          JSON.stringify(item.content)
         );
-      })
-      .then(() => {
-        getAllPatients().then(allPatients => {
-          downloadFile(
-            patient_table_name + Constants.backup_extension,
-            JSON.stringify(allPatients)
-          );
-        });
-      })
-      .then(() => {
-        getAllSettings().then(allSettings => {
-          downloadFile(
-            settings_table_name + Constants.backup_extension,
-            JSON.stringify(allSettings)
-          );
-        });
-      })
-      .then(() => {
-        this.setState({ showActivityIndicator: false });
-        ShowOkAlert("Backup Completed ..!");
+        promises.push(p);
       });
+      const folder = await Promise.all(promises);
+
+      ShowOkAlert("Backup successful, files stored at : \n" + folder[0]);
+      this.setState({ showActivityIndicator: false });
+    } catch (err) {
+      this.setState({ showActivityIndicator: false });
+      ShowOkAlert("Error occurred while taking backup :" + err);
+    }
   }
 
   restore() {
     this.setState({ showActivityIndicator: true });
-
     resourcePicker(DocumentPickerUtil.allFiles()).then(res => {
-      let tableName = res.fileName.split(".")[0];
+      let tableName = res
+        ? res.fileName.split(".")[0]
+        : this.setState({ showActivityIndicator: false });
       if (tableName) {
         switch (tableName) {
           case appointment_table_name:
@@ -159,22 +160,11 @@ export default class BackupRestore extends Component {
         <ActivityProgress
           showActivityIndicator={this.state.showActivityIndicator}
         />
-        <Header style={styles.themeColor}>
-          <Left>
-            <Button transparent onPress={() => this.props.navigation.goBack()}>
-              <Icon
-                name="arrow-back"
-                style={[
-                  Styles.iconStyle,
-                  { color: Constants.theme_compliment_color }
-                ]}
-              />
-            </Button>
-          </Left>
-          <Body style={styles.themeComplementColor}>
-            <Title>Backup and Restore</Title>
-          </Body>
-        </Header>
+        <CommonHeader
+          title="Backup and Restore"
+          iconName="arrow-back"
+          goBack={this.props.navigation.goBack}
+        />
         <Content>
           <List>
             <ListItem>

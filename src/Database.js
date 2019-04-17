@@ -23,7 +23,8 @@ export const AppointmentSchema = {
     timestamp: "date",
     duration: { type: "int", default: 30 },
     status: { type: "int", default: 1 },
-    earnings: "int?"
+    earnings: "int?",
+    images: { type: "string[]", default: [] }
   }
 };
 
@@ -69,6 +70,25 @@ export const getAllAppointment = async () =>
         realm.write(() => {
           let appointments = realm.objects(appointment_table_name);
           resolve(Array.from(appointments));
+        });
+      })
+      .catch(error => reject(error));
+  });
+
+/**
+ *
+ * @param {*} appointment
+ */
+export const getAppointmentById = appointmentId =>
+  new Promise((resolve, reject) => {
+    Realm.open(databaseOptions)
+      .then(realm => {
+        realm.write(() => {
+          let appointment = realm.objectForPrimaryKey(
+            appointment_table_name,
+            appointmentId
+          );
+          resolve(JSON.parse(JSON.stringify(appointment)));
         });
       })
       .catch(error => reject(error));
@@ -147,7 +167,8 @@ export const updateAppointment = appointment =>
           appointmentToBeUpdated.duration = appointment.duration;
           appointmentToBeUpdated.status = appointment.status;
           appointmentToBeUpdated.earnings = appointment.earnings;
-          resolve(appointmentToBeUpdated);
+          appointmentToBeUpdated.images = appointment.images;
+          resolve(true);
         });
       })
       .catch(error => reject(error));

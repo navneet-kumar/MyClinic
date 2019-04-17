@@ -31,20 +31,6 @@ const Constants = {
    * permissions["android.permission.READ_CONTACTS"]
    */
   permissions: null,
-  treatments: [
-    "Treatment",
-    "COMPLETE DENTURE",
-    "TOOTH COLORED PERMANENT FILLING",
-    "OCCLUSAL SPLINT (NIGHT GUARD)",
-    "ORTHODONTIC TREATMENT- BRACES",
-    "Painless root canal treatment",
-    "Fixed Partial Denture (Fixed tooth)",
-    "Extraction (tooth removal)",
-    "Cap replacement",
-    "Check-up and xray (dental radiograph)",
-    "TOOTH JEWELRY",
-    "PAINLESS KIDS ROOT CANAL TREATMENT"
-  ],
   myclinic_address:
     "Dr. Purnata's Dental & Cosmetic Care Flat no. 6, Between Lane 5 & 6, Ganga Cascade, Meera Nagar, Koregaon Park, Pune, Maharashtra, Mobile no - +91 80-3364-7478",
 
